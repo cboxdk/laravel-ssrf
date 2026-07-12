@@ -37,7 +37,7 @@ Environment overrides: `SSRF_ENFORCE`.
 ## Requirements
 
 - PHP `^8.4`
-- Laravel 12 (`illuminate/*` `^12`)
+- Laravel 12 or 13 (`illuminate/*` `^12 || ^13`)
 
 `ext-curl` is recommended: DNS pinning uses `CURLOPT_RESOLVE`, so without the cURL
 handler the guard still validates and disables redirects but cannot pin the socket.
