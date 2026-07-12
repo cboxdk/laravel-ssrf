@@ -4,6 +4,14 @@
     "type": "library",
     "license": "MIT",
     "keywords": ["laravel", "security", "ssrf", "http", "url"],
+    "authors": [
+        { "name": "Cbox", "homepage": "https://cboxdk.com" }
+    ],
+    "support": {
+        "issues": "https://github.com/cboxdk/laravel-ssrf/issues",
+        "source": "https://github.com/cboxdk/laravel-ssrf",
+        "security": "https://github.com/cboxdk/laravel-ssrf/security/policy"
+    },
     "require": {
         "php": "^8.4",
         "illuminate/contracts": "^12.0",

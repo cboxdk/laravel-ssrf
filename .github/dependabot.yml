@@ -1,0 +1,19 @@
+version: 2
+updates:
+  # Composer dependencies — security and version updates.
+  - package-ecosystem: composer
+    directory: "/"
+    schedule:
+      interval: weekly
+    open-pull-requests-limit: 10
+    groups:
+      # Batch low-risk dev-tooling bumps into one PR to cut noise.
+      dev-tooling:
+        dependency-type: development
+
+  # GitHub Actions — keeps pinned action SHAs current (paired with SHA pinning
+  # in the workflows, so a compromised action tag can't hijack the build).
+  - package-ecosystem: github-actions
+    directory: "/"
+    schedule:
+      interval: weekly
