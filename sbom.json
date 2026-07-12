@@ -1,0 +1,1187 @@
+{
+    "bomFormat": "CycloneDX",
+    "specVersion": "1.5",
+    "serialNumber": "urn:uuid:33c697cc-33d6-4c42-9906-d00470f2324c",
+    "version": 1,
+    "metadata": {
+        "tools": [
+            {
+                "vendor": "cboxdk",
+                "name": "laravel-id-sbom",
+                "version": "1.0.0"
+            }
+        ],
+        "component": {
+            "type": "library",
+            "bom-ref": "cboxdk/laravel-ssrf",
+            "name": "cboxdk/laravel-ssrf",
+            "purl": "pkg:composer/cboxdk/laravel-ssrf"
+        }
+    },
+    "components": [
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/brick/math@0.14.8",
+            "group": "brick",
+            "name": "math",
+            "version": "0.14.8",
+            "purl": "pkg:composer/brick/math@0.14.8",
+            "description": "Arbitrary-precision arithmetic library",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/carbonphp/carbon-doctrine-types@3.2.0",
+            "group": "carbonphp",
+            "name": "carbon-doctrine-types",
+            "version": "3.2.0",
+            "purl": "pkg:composer/carbonphp/carbon-doctrine-types@3.2.0",
+            "description": "Types to use Carbon in Doctrine",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/dflydev/dot-access-data@v3.0.3",
+            "group": "dflydev",
+            "name": "dot-access-data",
+            "version": "v3.0.3",
+            "purl": "pkg:composer/dflydev/dot-access-data@v3.0.3",
+            "description": "Given a deep data structure, access data by dot notation.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/doctrine/inflector@2.1.0",
+            "group": "doctrine",
+            "name": "inflector",
+            "version": "2.1.0",
+            "purl": "pkg:composer/doctrine/inflector@2.1.0",
+            "description": "PHP Doctrine Inflector is a small library that can perform string manipulations with regard to upper/lowercase and singular/plural forms of words.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/doctrine/lexer@3.0.1",
+            "group": "doctrine",
+            "name": "lexer",
+            "version": "3.0.1",
+            "purl": "pkg:composer/doctrine/lexer@3.0.1",
+            "description": "PHP Doctrine Lexer parser library that can be used in Top-Down, Recursive Descent Parsers.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/dragonmantank/cron-expression@v3.6.0",
+            "group": "dragonmantank",
+            "name": "cron-expression",
+            "version": "v3.6.0",
+            "purl": "pkg:composer/dragonmantank/cron-expression@v3.6.0",
+            "description": "CRON for PHP: Calculate the next or previous run date and determine if a CRON expression is due",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/egulias/email-validator@4.0.4",
+            "group": "egulias",
+            "name": "email-validator",
+            "version": "4.0.4",
+            "purl": "pkg:composer/egulias/email-validator@4.0.4",
+            "description": "A library for validating emails against several RFCs",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/fruitcake/php-cors@v1.4.0",
+            "group": "fruitcake",
+            "name": "php-cors",
+            "version": "v1.4.0",
+            "purl": "pkg:composer/fruitcake/php-cors@v1.4.0",
+            "description": "Cross-origin resource sharing library for the Symfony HttpFoundation",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/graham-campbell/result-type@v1.1.4",
+            "group": "graham-campbell",
+            "name": "result-type",
+            "version": "v1.1.4",
+            "purl": "pkg:composer/graham-campbell/result-type@v1.1.4",
+            "description": "An Implementation Of The Result Type",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/guzzlehttp/guzzle@7.14.0",
+            "group": "guzzlehttp",
+            "name": "guzzle",
+            "version": "7.14.0",
+            "purl": "pkg:composer/guzzlehttp/guzzle@7.14.0",
+            "description": "Guzzle is a PHP HTTP client library",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/guzzlehttp/promises@2.5.1",
+            "group": "guzzlehttp",
+            "name": "promises",
+            "version": "2.5.1",
+            "purl": "pkg:composer/guzzlehttp/promises@2.5.1",
+            "description": "Guzzle promises library",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/guzzlehttp/psr7@2.12.4",
+            "group": "guzzlehttp",
+            "name": "psr7",
+            "version": "2.12.4",
+            "purl": "pkg:composer/guzzlehttp/psr7@2.12.4",
+            "description": "PSR-7 message implementation that also provides common utility methods",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/guzzlehttp/uri-template@v1.0.9",
+            "group": "guzzlehttp",
+            "name": "uri-template",
+            "version": "v1.0.9",
+            "purl": "pkg:composer/guzzlehttp/uri-template@v1.0.9",
+            "description": "A polyfill class for uri_template of PHP",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/laravel/framework@v12.63.0",
+            "group": "laravel",
+            "name": "framework",
+            "version": "v12.63.0",
+            "purl": "pkg:composer/laravel/framework@v12.63.0",
+            "description": "The Laravel Framework.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/laravel/prompts@v0.3.21",
+            "group": "laravel",
+            "name": "prompts",
+            "version": "v0.3.21",
+            "purl": "pkg:composer/laravel/prompts@v0.3.21",
+            "description": "Add beautiful and user-friendly forms to your command-line applications.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/laravel/serializable-closure@v2.0.13",
+            "group": "laravel",
+            "name": "serializable-closure",
+            "version": "v2.0.13",
+            "purl": "pkg:composer/laravel/serializable-closure@v2.0.13",
+            "description": "Laravel Serializable Closure provides an easy and secure way to serialize closures in PHP.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/league/commonmark@2.8.3",
+            "group": "league",
+            "name": "commonmark",
+            "version": "2.8.3",
+            "purl": "pkg:composer/league/commonmark@2.8.3",
+            "description": "Highly-extensible PHP Markdown parser which fully supports the CommonMark spec and GitHub-Flavored Markdown (GFM)",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "BSD-3-Clause"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/league/config@v1.2.0",
+            "group": "league",
+            "name": "config",
+            "version": "v1.2.0",
+            "purl": "pkg:composer/league/config@v1.2.0",
+            "description": "Define configuration arrays with strict schemas and access values with dot notation",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "BSD-3-Clause"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/league/flysystem@3.35.2",
+            "group": "league",
+            "name": "flysystem",
+            "version": "3.35.2",
+            "purl": "pkg:composer/league/flysystem@3.35.2",
+            "description": "File storage abstraction for PHP",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/league/flysystem-local@3.31.0",
+            "group": "league",
+            "name": "flysystem-local",
+            "version": "3.31.0",
+            "purl": "pkg:composer/league/flysystem-local@3.31.0",
+            "description": "Local filesystem adapter for Flysystem.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/league/mime-type-detection@1.17.0",
+            "group": "league",
+            "name": "mime-type-detection",
+            "version": "1.17.0",
+            "purl": "pkg:composer/league/mime-type-detection@1.17.0",
+            "description": "Mime-type detection for Flysystem",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/league/uri@7.8.1",
+            "group": "league",
+            "name": "uri",
+            "version": "7.8.1",
+            "purl": "pkg:composer/league/uri@7.8.1",
+            "description": "URI manipulation library",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/league/uri-interfaces@7.8.1",
+            "group": "league",
+            "name": "uri-interfaces",
+            "version": "7.8.1",
+            "purl": "pkg:composer/league/uri-interfaces@7.8.1",
+            "description": "Common tools for parsing and resolving RFC3987/RFC3986 URI",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/monolog/monolog@3.10.0",
+            "group": "monolog",
+            "name": "monolog",
+            "version": "3.10.0",
+            "purl": "pkg:composer/monolog/monolog@3.10.0",
+            "description": "Sends your logs to files, sockets, inboxes, databases and various web services",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/nesbot/carbon@3.13.1",
+            "group": "nesbot",
+            "name": "carbon",
+            "version": "3.13.1",
+            "purl": "pkg:composer/nesbot/carbon@3.13.1",
+            "description": "An API extension for DateTime that supports 281 different languages.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/nette/schema@v1.3.5",
+            "group": "nette",
+            "name": "schema",
+            "version": "v1.3.5",
+            "purl": "pkg:composer/nette/schema@v1.3.5",
+            "description": "\ud83d\udcd0 Nette Schema: validating data structures against a given Schema.",
+            "licenses": [
+                {
+                    "expression": "(BSD-3-Clause OR GPL-2.0-only OR GPL-3.0-only)"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/nette/utils@v4.1.4",
+            "group": "nette",
+            "name": "utils",
+            "version": "v4.1.4",
+            "purl": "pkg:composer/nette/utils@v4.1.4",
+            "description": "\ud83d\udee0  Nette Utils: lightweight utilities for string & array manipulation, image handling, safe JSON encoding/decoding, validation, slug or strong password generating etc.",
+            "licenses": [
+                {
+                    "expression": "(BSD-3-Clause OR GPL-2.0-only OR GPL-3.0-only)"
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/nunomaduro/termwind@v2.4.0",
+            "group": "nunomaduro",
+            "name": "termwind",
+            "version": "v2.4.0",
+            "purl": "pkg:composer/nunomaduro/termwind@v2.4.0",
+            "description": "It's like Tailwind CSS, but for the console.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/phpoption/phpoption@1.9.5",
+            "group": "phpoption",
+            "name": "phpoption",
+            "version": "1.9.5",
+            "purl": "pkg:composer/phpoption/phpoption@1.9.5",
+            "description": "Option Type for PHP",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "Apache-2.0"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/psr/clock@1.0.0",
+            "group": "psr",
+            "name": "clock",
+            "version": "1.0.0",
+            "purl": "pkg:composer/psr/clock@1.0.0",
+            "description": "Common interface for reading the clock.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/psr/container@2.0.2",
+            "group": "psr",
+            "name": "container",
+            "version": "2.0.2",
+            "purl": "pkg:composer/psr/container@2.0.2",
+            "description": "Common Container Interface (PHP FIG PSR-11)",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/psr/event-dispatcher@1.0.0",
+            "group": "psr",
+            "name": "event-dispatcher",
+            "version": "1.0.0",
+            "purl": "pkg:composer/psr/event-dispatcher@1.0.0",
+            "description": "Standard interfaces for event handling.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/psr/http-client@1.0.3",
+            "group": "psr",
+            "name": "http-client",
+            "version": "1.0.3",
+            "purl": "pkg:composer/psr/http-client@1.0.3",
+            "description": "Common interface for HTTP clients",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/psr/http-factory@1.1.0",
+            "group": "psr",
+            "name": "http-factory",
+            "version": "1.1.0",
+            "purl": "pkg:composer/psr/http-factory@1.1.0",
+            "description": "PSR-17: Common interfaces for PSR-7 HTTP message factories",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/psr/http-message@2.0",
+            "group": "psr",
+            "name": "http-message",
+            "version": "2.0",
+            "purl": "pkg:composer/psr/http-message@2.0",
+            "description": "Common interface for HTTP messages",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/psr/log@3.0.2",
+            "group": "psr",
+            "name": "log",
+            "version": "3.0.2",
+            "purl": "pkg:composer/psr/log@3.0.2",
+            "description": "Common interface for logging libraries",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/psr/simple-cache@3.0.0",
+            "group": "psr",
+            "name": "simple-cache",
+            "version": "3.0.0",
+            "purl": "pkg:composer/psr/simple-cache@3.0.0",
+            "description": "Common interfaces for simple caching",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/ralouphie/getallheaders@3.0.3",
+            "group": "ralouphie",
+            "name": "getallheaders",
+            "version": "3.0.3",
+            "purl": "pkg:composer/ralouphie/getallheaders@3.0.3",
+            "description": "A polyfill for getallheaders.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/ramsey/collection@2.1.1",
+            "group": "ramsey",
+            "name": "collection",
+            "version": "2.1.1",
+            "purl": "pkg:composer/ramsey/collection@2.1.1",
+            "description": "A PHP library for representing and manipulating collections.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/ramsey/uuid@4.9.3",
+            "group": "ramsey",
+            "name": "uuid",
+            "version": "4.9.3",
+            "purl": "pkg:composer/ramsey/uuid@4.9.3",
+            "description": "A PHP library for generating and working with universally unique identifiers (UUIDs).",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/clock@v8.1.0",
+            "group": "symfony",
+            "name": "clock",
+            "version": "v8.1.0",
+            "purl": "pkg:composer/symfony/clock@v8.1.0",
+            "description": "Decouples applications from the system clock",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/console@v7.4.14",
+            "group": "symfony",
+            "name": "console",
+            "version": "v7.4.14",
+            "purl": "pkg:composer/symfony/console@v7.4.14",
+            "description": "Eases the creation of beautiful and testable command line interfaces",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/css-selector@v8.1.0",
+            "group": "symfony",
+            "name": "css-selector",
+            "version": "v8.1.0",
+            "purl": "pkg:composer/symfony/css-selector@v8.1.0",
+            "description": "Converts CSS selectors to XPath expressions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+            "group": "symfony",
+            "name": "deprecation-contracts",
+            "version": "v3.7.1",
+            "purl": "pkg:composer/symfony/deprecation-contracts@v3.7.1",
+            "description": "A generic function and convention to trigger deprecation notices",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/error-handler@v7.4.14",
+            "group": "symfony",
+            "name": "error-handler",
+            "version": "v7.4.14",
+            "purl": "pkg:composer/symfony/error-handler@v7.4.14",
+            "description": "Provides tools to manage errors and ease debugging PHP code",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/event-dispatcher@v8.1.1",
+            "group": "symfony",
+            "name": "event-dispatcher",
+            "version": "v8.1.1",
+            "purl": "pkg:composer/symfony/event-dispatcher@v8.1.1",
+            "description": "Provides tools that allow your application components to communicate with each other by dispatching events and listening to them",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/event-dispatcher-contracts@v3.7.1",
+            "group": "symfony",
+            "name": "event-dispatcher-contracts",
+            "version": "v3.7.1",
+            "purl": "pkg:composer/symfony/event-dispatcher-contracts@v3.7.1",
+            "description": "Generic abstractions related to dispatching event",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/finder@v7.4.14",
+            "group": "symfony",
+            "name": "finder",
+            "version": "v7.4.14",
+            "purl": "pkg:composer/symfony/finder@v7.4.14",
+            "description": "Finds files and directories via an intuitive fluent interface",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/http-foundation@v7.4.14",
+            "group": "symfony",
+            "name": "http-foundation",
+            "version": "v7.4.14",
+            "purl": "pkg:composer/symfony/http-foundation@v7.4.14",
+            "description": "Defines an object-oriented layer for the HTTP specification",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/http-kernel@v7.4.14",
+            "group": "symfony",
+            "name": "http-kernel",
+            "version": "v7.4.14",
+            "purl": "pkg:composer/symfony/http-kernel@v7.4.14",
+            "description": "Provides a structured process for converting a Request into a Response",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/mailer@v7.4.14",
+            "group": "symfony",
+            "name": "mailer",
+            "version": "v7.4.14",
+            "purl": "pkg:composer/symfony/mailer@v7.4.14",
+            "description": "Helps sending emails",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/mime@v7.4.13",
+            "group": "symfony",
+            "name": "mime",
+            "version": "v7.4.13",
+            "purl": "pkg:composer/symfony/mime@v7.4.13",
+            "description": "Allows manipulating MIME messages",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-ctype@v1.37.0",
+            "group": "symfony",
+            "name": "polyfill-ctype",
+            "version": "v1.37.0",
+            "purl": "pkg:composer/symfony/polyfill-ctype@v1.37.0",
+            "description": "Symfony polyfill for ctype functions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-intl-grapheme@v1.38.1",
+            "group": "symfony",
+            "name": "polyfill-intl-grapheme",
+            "version": "v1.38.1",
+            "purl": "pkg:composer/symfony/polyfill-intl-grapheme@v1.38.1",
+            "description": "Symfony polyfill for intl's grapheme_* functions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-intl-idn@v1.38.1",
+            "group": "symfony",
+            "name": "polyfill-intl-idn",
+            "version": "v1.38.1",
+            "purl": "pkg:composer/symfony/polyfill-intl-idn@v1.38.1",
+            "description": "Symfony polyfill for intl's idn_to_ascii and idn_to_utf8 functions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-intl-normalizer@v1.38.0",
+            "group": "symfony",
+            "name": "polyfill-intl-normalizer",
+            "version": "v1.38.0",
+            "purl": "pkg:composer/symfony/polyfill-intl-normalizer@v1.38.0",
+            "description": "Symfony polyfill for intl's Normalizer class and related functions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-mbstring@v1.38.2",
+            "group": "symfony",
+            "name": "polyfill-mbstring",
+            "version": "v1.38.2",
+            "purl": "pkg:composer/symfony/polyfill-mbstring@v1.38.2",
+            "description": "Symfony polyfill for the Mbstring extension",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-php80@v1.37.0",
+            "group": "symfony",
+            "name": "polyfill-php80",
+            "version": "v1.37.0",
+            "purl": "pkg:composer/symfony/polyfill-php80@v1.37.0",
+            "description": "Symfony polyfill backporting some PHP 8.0+ features to lower PHP versions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-php83@v1.38.2",
+            "group": "symfony",
+            "name": "polyfill-php83",
+            "version": "v1.38.2",
+            "purl": "pkg:composer/symfony/polyfill-php83@v1.38.2",
+            "description": "Symfony polyfill backporting some PHP 8.3+ features to lower PHP versions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-php84@v1.38.1",
+            "group": "symfony",
+            "name": "polyfill-php84",
+            "version": "v1.38.1",
+            "purl": "pkg:composer/symfony/polyfill-php84@v1.38.1",
+            "description": "Symfony polyfill backporting some PHP 8.4+ features to lower PHP versions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-php85@v1.38.1",
+            "group": "symfony",
+            "name": "polyfill-php85",
+            "version": "v1.38.1",
+            "purl": "pkg:composer/symfony/polyfill-php85@v1.38.1",
+            "description": "Symfony polyfill backporting some PHP 8.5+ features to lower PHP versions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/polyfill-uuid@v1.37.0",
+            "group": "symfony",
+            "name": "polyfill-uuid",
+            "version": "v1.37.0",
+            "purl": "pkg:composer/symfony/polyfill-uuid@v1.37.0",
+            "description": "Symfony polyfill for uuid functions",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/process@v7.4.13",
+            "group": "symfony",
+            "name": "process",
+            "version": "v7.4.13",
+            "purl": "pkg:composer/symfony/process@v7.4.13",
+            "description": "Executes commands in sub-processes",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/routing@v7.4.13",
+            "group": "symfony",
+            "name": "routing",
+            "version": "v7.4.13",
+            "purl": "pkg:composer/symfony/routing@v7.4.13",
+            "description": "Maps an HTTP request to a set of configuration variables",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/service-contracts@v3.7.1",
+            "group": "symfony",
+            "name": "service-contracts",
+            "version": "v3.7.1",
+            "purl": "pkg:composer/symfony/service-contracts@v3.7.1",
+            "description": "Generic abstractions related to writing services",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/string@v8.1.0",
+            "group": "symfony",
+            "name": "string",
+            "version": "v8.1.0",
+            "purl": "pkg:composer/symfony/string@v8.1.0",
+            "description": "Provides an object-oriented API to strings and deals with bytes, UTF-8 code points and grapheme clusters in a unified way",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/translation@v8.1.1",
+            "group": "symfony",
+            "name": "translation",
+            "version": "v8.1.1",
+            "purl": "pkg:composer/symfony/translation@v8.1.1",
+            "description": "Provides tools to internationalize your application",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/translation-contracts@v3.7.1",
+            "group": "symfony",
+            "name": "translation-contracts",
+            "version": "v3.7.1",
+            "purl": "pkg:composer/symfony/translation-contracts@v3.7.1",
+            "description": "Generic abstractions related to translation",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/uid@v7.4.9",
+            "group": "symfony",
+            "name": "uid",
+            "version": "v7.4.9",
+            "purl": "pkg:composer/symfony/uid@v7.4.9",
+            "description": "Provides an object-oriented API to generate and represent UIDs",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/symfony/var-dumper@v7.4.14",
+            "group": "symfony",
+            "name": "var-dumper",
+            "version": "v7.4.14",
+            "purl": "pkg:composer/symfony/var-dumper@v7.4.14",
+            "description": "Provides mechanisms for walking through any arbitrary PHP variable",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/tijsverkoyen/css-to-inline-styles@v2.4.0",
+            "group": "tijsverkoyen",
+            "name": "css-to-inline-styles",
+            "version": "v2.4.0",
+            "purl": "pkg:composer/tijsverkoyen/css-to-inline-styles@v2.4.0",
+            "description": "CssToInlineStyles is a class that enables you to convert HTML-pages/files into HTML-pages/files with inline styles. This is very useful when you're sending emails.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "BSD-3-Clause"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/vlucas/phpdotenv@v5.6.4",
+            "group": "vlucas",
+            "name": "phpdotenv",
+            "version": "v5.6.4",
+            "purl": "pkg:composer/vlucas/phpdotenv@v5.6.4",
+            "description": "Loads environment variables from `.env` to `getenv()`, `$_ENV` and `$_SERVER` automagically.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "BSD-3-Clause"
+                    }
+                }
+            ]
+        },
+        {
+            "type": "library",
+            "bom-ref": "pkg:composer/voku/portable-ascii@2.1.1",
+            "group": "voku",
+            "name": "portable-ascii",
+            "version": "2.1.1",
+            "purl": "pkg:composer/voku/portable-ascii@2.1.1",
+            "description": "Portable ASCII library - performance optimized (ascii) string functions for php.",
+            "licenses": [
+                {
+                    "license": {
+                        "id": "MIT"
+                    }
+                }
+            ]
+        }
+    ]
+}

@@ -1,0 +1,42 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        php: ["8.4", "8.5"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+          tools: composer:v2
+      - run: composer install --no-interaction --no-progress
+      - name: Pint (lint)
+        run: vendor/bin/pint --test
+      - name: PHPStan
+        run: vendor/bin/phpstan analyse --no-progress --memory-limit=1G
+      - name: Pest
+        run: vendor/bin/pest
+      - name: Security audit
+        run: composer audit --no-dev
+      - name: License compliance
+        run: composer license-check
+      - name: SBOM is up to date
+        run: |
+          composer sbom
+          git diff --exit-code sbom.json \
+            || (echo "::error::sbom.json is stale — run 'composer sbom' and commit the result." && exit 1)
+      - name: Upload SBOM
+        if: matrix.php == '8.4'
+        uses: actions/upload-artifact@v4
+        with:
+          name: sbom-cyclonedx
+          path: sbom.json

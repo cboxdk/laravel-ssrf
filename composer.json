@@ -1,0 +1,60 @@
+{
+    "name": "cboxdk/laravel-ssrf",
+    "description": "Cbox SSRF — a hardened, config-driven guard against server-side request forgery for outbound URLs in Laravel. Blocks private/reserved/cloud-metadata targets, pins DNS, and refuses redirects.",
+    "type": "library",
+    "license": "MIT",
+    "keywords": ["laravel", "security", "ssrf", "http", "url"],
+    "require": {
+        "php": "^8.4",
+        "illuminate/contracts": "^12.0",
+        "illuminate/http": "^12.0",
+        "illuminate/support": "^12.0",
+        "symfony/http-foundation": "^7.0"
+    },
+    "require-dev": {
+        "larastan/larastan": "^3.0",
+        "laravel/pint": "^1.18",
+        "orchestra/testbench": "^10.0",
+        "pestphp/pest": "^3.5"
+    },
+    "bin": [
+        "bin/check-licenses.php",
+        "bin/generate-sbom.php"
+    ],
+    "autoload": {
+        "psr-4": { "Cbox\\Ssrf\\": "src/" }
+    },
+    "autoload-dev": {
+        "psr-4": { "Cbox\\Ssrf\\Tests\\": "tests/" }
+    },
+    "scripts": {
+        "lint": "pint --test",
+        "analyse": "phpstan analyse --no-progress --memory-limit=1G",
+        "test": "pest",
+        "license-check": "@php bin/check-licenses.php",
+        "sbom": "@php bin/generate-sbom.php",
+        "qa": [
+            "@lint",
+            "@analyse",
+            "@test",
+            "@license-check",
+            "@composer audit"
+        ]
+    },
+    "scripts-descriptions": {
+        "license-check": "Fail if any dependency is not permissively licensed (SBOM/compliance gate).",
+        "sbom": "Generate a CycloneDX 1.5 SBOM (sbom.json) from composer.lock.",
+        "qa": "Run the full quality gate: lint, static analysis, tests, license check, security audit."
+    },
+    "extra": {
+        "laravel": { "providers": ["Cbox\\Ssrf\\SsrfServiceProvider"] }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "config": {
+        "sort-packages": true,
+        "allow-plugins": {
+            "pestphp/pest-plugin": true
+        }
+    }
+}
