@@ -132,6 +132,12 @@ $this->app->instance(Resolver::class, new FakeResolver([
 ]));
 ```
 
+## Documentation
+
+Full docs in [`docs/`](docs/index.md) — [installation](docs/getting-started/installation.md),
+[quickstart](docs/getting-started/quickstart.md), [architecture](docs/architecture.md),
+[security](docs/security.md), [extending](docs/extending.md) and [testing](docs/testing.md).
+
 ## License
 
 MIT © Cbox. See [LICENSE](LICENSE).
