@@ -9,8 +9,12 @@ jobs:
   quality:
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         php: ["8.4", "8.5"]
+        # Test both the current and previous Laravel major (12 and 13).
+        testbench: ["^10.0", "^11.0"]
+    name: PHP ${{ matrix.php }} · testbench ${{ matrix.testbench }}
     steps:
       - uses: actions/checkout@v4
       - uses: shivammathur/setup-php@v2
@@ -18,7 +22,9 @@ jobs:
           php-version: ${{ matrix.php }}
           coverage: none
           tools: composer:v2
-      - run: composer install --no-interaction --no-progress
+      - name: Pin the Laravel major
+        run: composer require "orchestra/testbench:${{ matrix.testbench }}" --dev --no-update --no-interaction
+      - run: composer update --no-interaction --no-progress --prefer-dist
       - name: Pint (lint)
         run: vendor/bin/pint --test
       - name: PHPStan
@@ -29,13 +35,16 @@ jobs:
         run: composer audit --no-dev
       - name: License compliance
         run: composer license-check
+      # The SBOM is derived from composer.lock, which differs per Laravel major,
+      # so only assert freshness on the canonical cell (latest major).
       - name: SBOM is up to date
+        if: matrix.php == '8.4' && matrix.testbench == '^11.0'
         run: |
           composer sbom
           git diff --exit-code sbom.json \
             || (echo "::error::sbom.json is stale — run 'composer sbom' and commit the result." && exit 1)
       - name: Upload SBOM
-        if: matrix.php == '8.4'
+        if: matrix.php == '8.4' && matrix.testbench == '^11.0'
         uses: actions/upload-artifact@v4
         with:
           name: sbom-cyclonedx
