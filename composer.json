@@ -55,7 +55,8 @@
         "qa": "Run the full quality gate: lint, static analysis, tests, license check, security audit."
     },
     "extra": {
-        "laravel": { "providers": ["Cbox\\Ssrf\\SsrfServiceProvider"] }
+        "laravel": { "providers": ["Cbox\\Ssrf\\SsrfServiceProvider"] },
+        "branch-alias": { "dev-main": "1.0.x-dev" }
     },
     "minimum-stability": "dev",
     "prefer-stable": true,
