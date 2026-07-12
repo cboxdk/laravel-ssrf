@@ -12,7 +12,7 @@ permissions:
   contents: read
 
 jobs:
-  # Dependency vulnerability scan — a second source alongside `composer audit`.
+  # Dependency vulnerability scan against the PHP Security Advisories database.
   dependencies:
     runs-on: ubuntu-latest
     steps:
@@ -25,27 +25,22 @@ jobs:
       - run: composer install --no-interaction --no-progress
       - name: composer audit
         run: composer audit --no-dev
-      - name: OSV-Scanner (composer.lock)
-        uses: google/osv-scanner-action/osv-scanner-action@v2
-        with:
-          scan-args: |-
-            --lockfile=composer.lock
 
-  # Secret scanning — a leaked key is the worst failure mode for an auth library.
+  # Secret scanning — a leaked key is the worst failure mode for a security lib.
+  # TruffleHog's action is free for organizations (gitleaks-action is not).
   secrets:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      - name: gitleaks
-        uses: gitleaks/gitleaks-action@v2
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: TruffleHog
+        uses: trufflesecurity/trufflehog@main
+        with:
+          extra_args: --only-verified
 
-  # Static application security testing (SAST). Findings are uploaded to the
-  # repository Security tab as SARIF rather than failing the build, so triage
-  # happens in code review.
+  # Static application security testing. Findings are uploaded to the Security tab
+  # as SARIF rather than failing the build, so triage happens in review.
   sast:
     runs-on: ubuntu-latest
     permissions:
