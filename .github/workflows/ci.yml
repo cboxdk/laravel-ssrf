@@ -16,7 +16,7 @@ jobs:
         testbench: ["^10.0", "^11.0"]
     name: PHP ${{ matrix.php }} · testbench ${{ matrix.testbench }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
