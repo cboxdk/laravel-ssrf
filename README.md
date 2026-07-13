@@ -136,7 +136,7 @@ $this->app->instance(Resolver::class, new FakeResolver([
 
 Full docs in [`docs/`](docs/index.md) — [requirements](docs/requirements.md), [installation](docs/getting-started/installation.md),
 [quickstart](docs/quickstart.md), [architecture](docs/core-concepts/architecture.md),
-[security](docs/security/index.md), [extending](docs/extension-points/index.md) and [testing](docs/getting-started/testing.md).
+[security](docs/security/_index.md), [extending](docs/extension-points/_index.md) and [testing](docs/getting-started/testing.md).
 
 ## License
 

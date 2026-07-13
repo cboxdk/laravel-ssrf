@@ -40,8 +40,8 @@ that defeat naive checks (DNS rebinding and redirect hops).
 - [Requirements](requirements.md) — PHP and Laravel versions
 - [Installation](getting-started/installation.md)
 - [Quickstart](quickstart.md) — guard a request in one line
-- [Cookbook](cookbook/index.md) — webhooks, form validation, custom clients
+- [Cookbook](cookbook/_index.md) — webhooks, form validation, custom clients
 - [Architecture](core-concepts/architecture.md) — the guard, the resolver, the policy
-- [Extending](extension-points/index.md) — custom resolvers and policy
+- [Extending](extension-points/_index.md) — custom resolvers and policy
 - [Testing](getting-started/testing.md) — the `FakeResolver` seam
-- [Security](security/index.md) — threat model and **honest scope**
+- [Security](security/_index.md) — threat model and **honest scope**

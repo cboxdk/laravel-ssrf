@@ -33,4 +33,4 @@ Registered via package auto-discovery — no manual provider wiring.
 via Guzzle's cURL `resolve` option. That path needs the **cURL** HTTP handler
 (the default for Laravel's HTTP client). Behind a forward HTTP proxy the proxy
 does its own resolution, which defeats pinning — see
-[Security](security/index.md) for the honest scope.
+[Security](security/_index.md) for the honest scope.

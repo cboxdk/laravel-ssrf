@@ -50,4 +50,4 @@ $data = $request->validate([
 
 Everything else — custom clients, browser-redirect validation, tuning the policy —
 builds on `app(Cbox\Ssrf\Contracts\UrlGuard::class)`. See the
-[Cookbook](cookbook/index.md).
+[Cookbook](cookbook/_index.md).
