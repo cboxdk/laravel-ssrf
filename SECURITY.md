@@ -6,9 +6,9 @@
 
 **Do not open a public issue.** Report privately via
 [GitHub Private Vulnerability Reporting](https://github.com/cboxdk/laravel-ssrf/security/advisories/new)
-or email **security@cboxdk.com**. We acknowledge within 2 business days and aim to
-fix confirmed High/Critical issues within 30 days. Good-faith research under this
-policy is authorized (safe harbor).
+(repository → **Security** → **Report a vulnerability**). This is a pre-1.0,
+best-effort open-source project; we'll respond as promptly as we can and coordinate
+disclosure with you. Good-faith research under this policy is authorized (safe harbor).
 
 If you have found an SSRF **bypass** — a URL that the guard accepts but which
 resolves to a private, reserved, or metadata address — that is exactly the class of
