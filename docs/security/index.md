@@ -47,5 +47,5 @@ around:
 ## Reporting
 
 Found a bypass — a URL the guard accepts that reaches a private/reserved/metadata
-address? That's the report we most want. See [SECURITY.md](../SECURITY.md) for the
+address? That's the report we most want. See [SECURITY.md](../../SECURITY.md) for the
 private channel and safe-harbor terms.

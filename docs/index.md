@@ -37,10 +37,11 @@ that defeat naive checks (DNS rebinding and redirect hops).
 
 ## Read next
 
+- [Requirements](requirements.md) — PHP and Laravel versions
 - [Installation](getting-started/installation.md)
-- [Quickstart](getting-started/quickstart.md) — guard a request in one line
-- [Cookbook](cookbook.md) — webhooks, form validation, custom clients
-- [Architecture](architecture.md) — the guard, the resolver, the policy
-- [Extending](extending.md) — custom resolvers and policy
-- [Testing](testing.md) — the `FakeResolver` seam
-- [Security](security.md) — threat model and **honest scope**
+- [Quickstart](quickstart.md) — guard a request in one line
+- [Cookbook](cookbook/index.md) — webhooks, form validation, custom clients
+- [Architecture](core-concepts/architecture.md) — the guard, the resolver, the policy
+- [Extending](extension-points/index.md) — custom resolvers and policy
+- [Testing](getting-started/testing.md) — the `FakeResolver` seam
+- [Security](security/index.md) — threat model and **honest scope**
