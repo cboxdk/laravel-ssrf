@@ -45,7 +45,7 @@ jobs:
             || (echo "::error::sbom.json is stale — run 'composer sbom' and commit the result." && exit 1)
       - name: Upload SBOM
         if: matrix.php == '8.4' && matrix.testbench == '^11.0'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sbom-cyclonedx
           path: sbom.json
