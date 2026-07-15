@@ -112,3 +112,53 @@ it('pins the connection and disables redirects for a safe URL', function (): voi
 it('resolves the UrlGuard contract from the container', function (): void {
     expect(app(UrlGuard::class))->toBeInstanceOf(Guard::class);
 });
+
+/*
+ * Per-call scheme/credential overrides (v1.1): one guard, several sinks.
+ */
+
+it('accepts a per-call scheme the global policy omits (ssh for git)', function (): void {
+    // Global allowed_schemes is [http, https]; ssh is refused by default…
+    expect(fn () => guard(['git.test' => ['93.184.216.34']])->assertSafe('ssh://git.test/acme/web.git'))
+        ->toThrow(BlockedUrl::class, 'scheme');
+
+    // …but a git sink may opt into it per call.
+    guard(['git.test' => ['93.184.216.34']])
+        ->assertSafe('ssh://git.test/acme/web.git', allowedSchemes: ['https', 'ssh']);
+
+    expect(true)->toBeTrue();
+});
+
+it('narrows schemes per call (a webhook sink refuses http)', function (): void {
+    // Global policy allows http, but a webhook sink pins to https only.
+    expect(guard(['hook.test' => ['93.184.216.34']])->isSafe('http://hook.test', allowedSchemes: ['https']))
+        ->toBeFalse()
+        ->and(guard(['hook.test' => ['93.184.216.34']])->isSafe('https://hook.test', allowedSchemes: ['https']))
+        ->toBeTrue();
+});
+
+it('permits embedded credentials only when the call opts in', function (): void {
+    // Default: credentials refused.
+    expect(fn () => guard(['git.test' => ['93.184.216.34']])->assertSafe('https://user:token@git.test/acme/web.git'))
+        ->toThrow(BlockedUrl::class, 'credentials');
+
+    // Opt-in: a git URL carrying a deploy token is accepted…
+    guard(['git.test' => ['93.184.216.34']])
+        ->assertSafe('https://user:token@git.test/acme/web.git', allowedSchemes: ['https', 'ssh'], allowCredentials: true);
+
+    expect(true)->toBeTrue();
+});
+
+it('still enforces the block-list under a per-call override', function (): void {
+    // A per-call scheme/credential override must NOT relax IP/host enforcement:
+    // a credentialed ssh URL to a private address is still refused.
+    guard(['git.test' => ['10.0.0.5']])
+        ->assertSafe('ssh://user:token@git.test/acme/web.git', allowedSchemes: ['https', 'ssh'], allowCredentials: true);
+})->throws(BlockedUrl::class);
+
+it('pins per-call for an overridden sink', function (): void {
+    $options = guard(['git.test' => ['93.184.216.34']])
+        ->pinnedOptions('https://user:token@git.test/acme/web.git', allowedSchemes: ['https', 'ssh'], allowCredentials: true);
+
+    expect($options['allow_redirects'])->toBeFalse();
+});

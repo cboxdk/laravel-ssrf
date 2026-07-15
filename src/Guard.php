@@ -23,15 +23,15 @@ final class Guard implements UrlGuard
         private readonly Resolver $resolver,
     ) {}
 
-    public function assertSafe(string $url): void
+    public function assertSafe(string $url, ?array $allowedSchemes = null, bool $allowCredentials = false): void
     {
-        $this->inspect($url, resolveDns: true);
+        $this->inspect($url, $this->policyFor($allowedSchemes, $allowCredentials), resolveDns: true);
     }
 
-    public function isSafe(string $url): bool
+    public function isSafe(string $url, ?array $allowedSchemes = null, bool $allowCredentials = false): bool
     {
         try {
-            $this->assertSafe($url);
+            $this->assertSafe($url, $allowedSchemes, $allowCredentials);
 
             return true;
         } catch (BlockedUrl) {
@@ -39,20 +39,21 @@ final class Guard implements UrlGuard
         }
     }
 
-    public function assertSafeRedirect(string $url): void
+    public function assertSafeRedirect(string $url, ?array $allowedSchemes = null, bool $allowCredentials = false): void
     {
         // Browser-redirect mode: don't resolve DNS (the browser does that at
         // click time), but still block IP literals in private/reserved ranges
         // and blocked hosts.
-        $this->inspect($url, resolveDns: false);
+        $this->inspect($url, $this->policyFor($allowedSchemes, $allowCredentials), resolveDns: false);
     }
 
-    public function pinnedOptions(string $url): array
+    public function pinnedOptions(string $url, ?array $allowedSchemes = null, bool $allowCredentials = false): array
     {
-        $inspection = $this->inspect($url, resolveDns: true);
+        $policy = $this->policyFor($allowedSchemes, $allowCredentials);
+        $inspection = $this->inspect($url, $policy, resolveDns: true);
         $ips = $inspection['ips'];
 
-        if ($ips === [] || ! $this->policy->pinDns) {
+        if ($ips === [] || ! $policy->pinDns) {
             // No redirects regardless — a 30x to a fresh host is another SSRF path.
             return ['allow_redirects' => false];
         }
@@ -85,9 +86,29 @@ final class Guard implements UrlGuard
     }
 
     /**
+     * The effective policy for a call: the configured policy, or a per-call
+     * variant when a scheme override or credential allowance is supplied.
+     *
+     * @param  list<string>|null  $allowedSchemes
+     */
+    private function policyFor(?array $allowedSchemes, bool $allowCredentials): GuardPolicy
+    {
+        if ($allowedSchemes === null && ! $allowCredentials) {
+            return $this->policy;
+        }
+
+        // A `false` $allowCredentials inherits the configured policy (null),
+        // rather than force-denying — so the global default still applies.
+        return $this->policy->with(
+            allowedSchemes: $allowedSchemes,
+            allowCredentials: $allowCredentials ? true : null,
+        );
+    }
+
+    /**
      * @return array{host: string, port: int, ips: list<string>}
      */
-    private function inspect(string $url, bool $resolveDns): array
+    private function inspect(string $url, GuardPolicy $policy, bool $resolveDns): array
     {
         $url = trim($url);
 
@@ -103,12 +124,13 @@ final class Guard implements UrlGuard
 
         $scheme = strtolower((string) $parts['scheme']);
 
-        if (! in_array($scheme, $this->policy->allowedSchemes, true)) {
+        if (! in_array($scheme, $policy->allowedSchemes, true)) {
             throw BlockedUrl::make("scheme [{$scheme}] is not allowed");
         }
 
-        // Embedded credentials (user:pass@host) are a classic SSRF/obfuscation trick.
-        if (isset($parts['user']) || isset($parts['pass'])) {
+        // Embedded credentials (user:pass@host) are a classic SSRF/obfuscation
+        // trick; permitted only when the caller opts in (e.g. a git deploy token).
+        if (! $policy->allowCredentials && (isset($parts['user']) || isset($parts['pass']))) {
             throw BlockedUrl::make('credentials in the URL are not allowed');
         }
 
@@ -118,7 +140,7 @@ final class Guard implements UrlGuard
             throw BlockedUrl::make('URL host is empty');
         }
 
-        if ($this->isBlockedHost($host)) {
+        if ($this->isBlockedHost($host, $policy)) {
             throw BlockedUrl::make("host [{$host}] is blocked");
         }
 
@@ -126,14 +148,14 @@ final class Guard implements UrlGuard
 
         // Enforcement can be disabled for on-prem installs that must reach
         // internal hosts; scheme/credential/host-block checks above still run.
-        if (! $this->policy->enforce) {
+        if (! $policy->enforce) {
             return ['host' => $host, 'port' => $port, 'ips' => []];
         }
 
         $ips = $resolveDns ? $this->resolveHost($host) : $this->ipLiteral($host);
 
         foreach ($ips as $ip) {
-            $this->assertPublicIp($ip, $host);
+            $this->assertPublicIp($ip, $host, $policy);
         }
 
         return ['host' => $host, 'port' => $port, 'ips' => $ips];
@@ -185,17 +207,17 @@ final class Guard implements UrlGuard
         return [];
     }
 
-    private function assertPublicIp(string $ip, string $host): void
+    private function assertPublicIp(string $ip, string $host, GuardPolicy $policy): void
     {
         if (filter_var($ip, FILTER_VALIDATE_IP) === false) {
             throw BlockedUrl::make("host [{$host}] resolved to an invalid IP [{$ip}]");
         }
 
-        if (in_array(strtolower($ip), $this->policy->blockedIps, true)) {
+        if (in_array(strtolower($ip), $policy->blockedIps, true)) {
             throw BlockedUrl::make("host [{$host}] resolves to a blocked address [{$ip}]");
         }
 
-        if ($this->policy->blockedCidrs !== [] && IpUtils::checkIp($ip, $this->policy->blockedCidrs)) {
+        if ($policy->blockedCidrs !== [] && IpUtils::checkIp($ip, $policy->blockedCidrs)) {
             throw BlockedUrl::make("host [{$host}] resolves to a non-public address [{$ip}]");
         }
 
@@ -205,7 +227,7 @@ final class Guard implements UrlGuard
         $embedded = $this->embeddedIpv4($ip);
 
         if ($embedded !== null && $embedded !== $ip) {
-            $this->assertPublicIp($embedded, $host);
+            $this->assertPublicIp($embedded, $host, $policy);
         }
     }
 
@@ -257,13 +279,13 @@ final class Guard implements UrlGuard
         return strtolower(rtrim(trim($host, '[]'), '.'));
     }
 
-    private function isBlockedHost(string $host): bool
+    private function isBlockedHost(string $host, GuardPolicy $policy): bool
     {
-        if (in_array($host, $this->policy->blockedHosts, true)) {
+        if (in_array($host, $policy->blockedHosts, true)) {
             return true;
         }
 
-        foreach ($this->policy->blockedHostSuffixes as $suffix) {
+        foreach ($policy->blockedHostSuffixes as $suffix) {
             if (str_ends_with($host, $suffix)) {
                 return true;
             }

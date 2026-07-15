@@ -87,6 +87,29 @@ $guard->isSafe($url);            // bool
 $guard->pinnedOptions($url);     // Guzzle options for your own client call
 ```
 
+### Per-sink scheme & credential rules
+
+One guard (with one shared block-list policy) can serve several outbound sinks
+with different rules. Pass a scheme allow-list and/or permit embedded credentials
+for that call only — the IP/host enforcement is never relaxed:
+
+```php
+// Webhook sink: HTTPS only, no credentials (the default).
+$guard->assertSafe($webhookUrl, ['https']);
+
+// Git sink: HTTPS or SSH, and a deploy token in the URL is allowed.
+$guard->assertSafe($repoUrl, ['https', 'ssh'], allowCredentials: true);
+Http::ssrf($repoUrl, ['https', 'ssh'], allowCredentials: true)->get($repoUrl);
+
+// Same overrides on the validation rule, per field:
+$request->validate([
+    'repo_url' => ['required', new PublicUrl(allowedSchemes: ['https', 'ssh'], allowCredentials: true)],
+]);
+```
+
+`allowed_schemes` and `allow_credentials` in `config/ssrf.php` set the defaults; a
+per-call override wins for that call and inherits every other setting.
+
 ### Browser-redirect targets (OAuth authorize URLs)
 
 A URL you hand to the user's browser as a redirect — rather than fetch yourself —
@@ -99,9 +122,9 @@ $guard->assertSafeRedirect($authorizeUrl);
 
 ## Configuration
 
-`config/ssrf.php` exposes the full policy: `allowed_schemes`, `blocked_hosts`,
-`blocked_host_suffixes`, `blocked_ips`, `blocked_cidrs`, `pin_dns`, and a master
-`enforce` switch. A single-tenant/on-prem install that must reach internal hosts can
+`config/ssrf.php` exposes the full policy: `allowed_schemes`, `allow_credentials`,
+`blocked_hosts`, `blocked_host_suffixes`, `blocked_ips`, `blocked_cidrs`, `pin_dns`,
+and a master `enforce` switch. A single-tenant/on-prem install that must reach internal hosts can
 set `SSRF_ENFORCE=false` (scheme, credential, and blocked-host checks still run).
 
 ## Honest scope

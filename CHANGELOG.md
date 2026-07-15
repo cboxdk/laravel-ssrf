@@ -4,6 +4,26 @@ All notable changes to `cboxdk/laravel-ssrf` are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0]
+
+### Added
+
+- **Per-call scheme and credential overrides.** `UrlGuard::assertSafe()`,
+  `isSafe()`, `assertSafeRedirect()`, and `pinnedOptions()` now take optional
+  `?array $allowedSchemes` and `bool $allowCredentials` arguments, so one guard
+  (with one shared block-list policy) can serve several outbound sinks with
+  different rules — e.g. `https`-only webhooks that reject credentials, and
+  `https`/`ssh` git URLs that carry a deploy token. `Http::ssrf()` and the
+  `PublicUrl` validation rule accept the same overrides.
+- `GuardPolicy::with(?array $allowedSchemes, ?bool $allowCredentials)` — a
+  per-call variant that overrides only those two dimensions and inherits the
+  configured `enforce`, `pin_dns`, and blocked host/IP/CIDR lists.
+- `allow_credentials` config key (default `false`) for the global default.
+
+Overrides never relax IP/host enforcement: a credentialed `ssh` URL to a private
+address is still refused. The additions are backward compatible — existing calls
+behave exactly as before.
+
 ## [1.0.0]
 
 Initial release.

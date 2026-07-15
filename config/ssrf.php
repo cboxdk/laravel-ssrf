@@ -13,6 +13,15 @@ return [
     'allowed_schemes' => ['http', 'https'],
 
     /*
+     * Whether a URL may carry embedded credentials (user:pass@host) by default.
+     * Kept false — credentials in a URL are a classic SSRF/obfuscation vector.
+     * A specific sink that legitimately needs them (e.g. a git clone URL with a
+     * deploy token) opts in per call: `assertSafe($url, allowCredentials: true)`
+     * or `new PublicUrl(allowCredentials: true)`.
+     */
+    'allow_credentials' => false,
+
+    /*
      * Master switch. When false, only scheme/credential checks run and DNS/IP
      * enforcement is skipped — for a single-tenant/on-prem install that must
      * legitimately reach internal hosts. Keep true in any multi-tenant deployment.
