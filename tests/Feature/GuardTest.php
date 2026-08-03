@@ -109,6 +109,46 @@ it('pins the connection and disables redirects for a safe URL', function (): voi
     }
 });
 
+it('pins every validated address in ONE resolve entry, not one entry each', function (): void {
+    // The bug this covers: curl treats a second CURLOPT_RESOLVE entry for the same
+    // host:port as a REPLACEMENT, not an addition. Emitting one entry per address
+    // therefore pinned only whichever sorted last and silently dropped the rest — and
+    // for a dual-stack host whose AAAA sorts last (accounts.google.com does), that meant
+    // every request was pinned to IPv6 alone. On a machine with no IPv6 route, every
+    // guarded call then failed to connect, with no fallback to the IPv4 address that had
+    // been validated moments earlier.
+    //
+    // Nothing in the code looked wrong: DNS resolved, both addresses were checked, the
+    // pin looked complete. It died at connect time with a transport error naming neither
+    // the pin nor the protocol, and it flipped with the environment — so it presented as
+    // "works on my machine".
+    $options = guard(['dual.test' => ['93.184.216.34', '2606:2800:220:1:248:1893:25c8:1946']])
+        ->pinnedOptions('https://dual.test/hook');
+
+    if (! defined('CURLOPT_RESOLVE')) {
+        expect(true)->toBeTrue();
+
+        return;
+    }
+
+    expect($options['curl'][CURLOPT_RESOLVE])->toHaveCount(1)
+        // curl's documented format: host:port:addr[,addr]... IPv6 bracketed, because a
+        // bare one is ambiguous against the colons the format itself uses.
+        ->and($options['curl'][CURLOPT_RESOLVE][0])
+        ->toBe('dual.test:443:93.184.216.34,[2606:2800:220:1:248:1893:25c8:1946]');
+});
+
+it('still accepts a connection to either pinned address', function (): void {
+    // The on_stats consistency check reads the ORIGINAL address list, so widening the
+    // pin must not narrow what is accepted afterwards — otherwise the request connects
+    // and is then rejected by our own guard.
+    $ips = ['93.184.216.34', '2606:2800:220:1:248:1893:25c8:1946'];
+    $options = guard(['dual.test' => $ips])->pinnedOptions('https://dual.test/hook');
+
+    expect($options)->toHaveKey('on_stats')
+        ->and($options['allow_redirects'])->toBeFalse();
+});
+
 it('resolves the UrlGuard contract from the container', function (): void {
     expect(app(UrlGuard::class))->toBeInstanceOf(Guard::class);
 });

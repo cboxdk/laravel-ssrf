@@ -4,6 +4,29 @@ All notable changes to `cboxdk/laravel-ssrf` are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.1]
+
+### Fixed
+
+- **DNS pinning dropped every address but the last, breaking dual-stack hosts.**
+  `pinnedOptions()` emitted one `CURLOPT_RESOLVE` entry per validated address, but curl
+  treats a second entry for the same `host:port` as a REPLACEMENT rather than an
+  addition. Only whichever address sorted last survived. For a dual-stack host whose
+  AAAA sorts last — `accounts.google.com` is one — every guarded request was pinned to
+  IPv6 alone, and on any machine without IPv6 connectivity it failed to connect with no
+  fallback to the IPv4 address that had been validated moments earlier.
+
+  Nothing about it looked wrong from the code: DNS resolved, every address was checked,
+  the pin looked complete. It died at connect time with a transport error naming neither
+  the pin nor the protocol, and because it depends on the host's own IPv6 routing it
+  presented as "works on my machine". Found while running a real OIDC discovery against
+  Google.
+
+  Now emitted as a single entry in curl's documented `host:port:addr[,addr]...` form, so
+  the whole validated set is offered and Happy Eyeballs picks a reachable one. The
+  `on_stats` consistency check is unchanged and still rejects any connection to an
+  address outside the validated set.
+
 ## [1.1.0]
 
 ### Added

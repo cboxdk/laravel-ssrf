@@ -74,11 +74,33 @@ final class Guard implements UrlGuard
         ];
 
         if (defined('CURLOPT_RESOLVE')) {
+            // ONE entry for the host:port, listing every validated address — not one
+            // entry per address.
+            //
+            // curl treats a second entry for the same `host:port` as a REPLACEMENT, not
+            // an addition, so a list of two produced a pin to whichever address happened
+            // to sort last and silently discarded the rest. For a dual-stack host whose
+            // AAAA sorts last (accounts.google.com does) that meant every request was
+            // pinned to IPv6 alone — and on any machine without IPv6 connectivity every
+            // guarded call failed to connect, with no fallback to the IPv4 address that
+            // had been validated a moment earlier.
+            //
+            // The failure is invisible from the code: DNS resolved, the addresses were
+            // checked, the pin looked complete, and the request died at connect time
+            // with a transport error naming neither the pin nor the protocol. It also
+            // flips with the environment, so it presents as "works on my machine".
+            //
+            // curl's documented format is `host:port:addr[,addr]...`, and with the whole
+            // list in one entry it does Happy Eyeballs across the family as usual.
             $options['curl'] = [
-                CURLOPT_RESOLVE => array_map(
-                    static fn (string $ip): string => $host.':'.$inspection['port'].':'.(str_contains($ip, ':') ? '['.$ip.']' : $ip),
-                    $ips,
-                ),
+                CURLOPT_RESOLVE => [
+                    $host.':'.$inspection['port'].':'.implode(',', array_map(
+                        // Bracketed, because a bare IPv6 address is ambiguous against the
+                        // colon separators the format itself uses.
+                        static fn (string $ip): string => str_contains($ip, ':') ? '['.$ip.']' : $ip,
+                        $ips,
+                    )),
+                ],
             ];
         }
 
