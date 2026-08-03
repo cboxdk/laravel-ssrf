@@ -5,3 +5,6 @@ parameters:
     level: max
     paths:
         - src
+        # Trait composition sites live here so the analyser sees the shipped
+        # Testing/ traits — PHPStan only checks a trait where it is used.
+        - tests/Fixtures

@@ -2,20 +2,16 @@
 
 declare(strict_types=1);
 
-use Cbox\Ssrf\Contracts\Resolver;
-use Cbox\Ssrf\Contracts\UrlGuard;
 use Cbox\Ssrf\Exceptions\BlockedUrl;
-use Cbox\Ssrf\GuardPolicy;
-use Cbox\Ssrf\Testing\FakeResolver;
 use Illuminate\Support\Facades\Http;
 use Psr\Http\Message\RequestInterface;
 
 beforeEach(function (): void {
-    $this->app->instance(Resolver::class, new FakeResolver([
+    $this->fakeSsrfDns([
         'good.test' => ['93.184.216.34'],
         'evil.test' => ['10.1.2.3'],
         'dual.test' => ['93.184.216.34', '2606:2800:220:1:248:1893:25c8:1946'],
-    ]));
+    ]);
 });
 
 /**
@@ -66,9 +62,7 @@ it('still validates the fetched URL when DNS pinning is off', function (): void 
     // With pin_dns off, pinnedOptions() returns no on_stats and no curl options — so
     // before this release NOTHING checked the URL that was actually fetched. Delete the
     // pinnedOptions() call in GuardRequestMiddleware and this test fails.
-    config(['ssrf.pin_dns' => false]);
-    $this->app->forgetInstance(GuardPolicy::class);
-    $this->app->forgetInstance(UrlGuard::class);
+    $this->withSsrfConfig(['pin_dns' => false]);
 
     Http::fake();
 
@@ -96,7 +90,7 @@ it('applies the resolve pin and disables redirects for the sent URL', function (
 
 it('honours per-call scheme and credential overrides on the sent URL', function (): void {
     Http::fake(['git.test/*' => Http::response('ok')]);
-    $this->app->instance(Resolver::class, new FakeResolver(['git.test' => ['93.184.216.34']]));
+    $this->fakeSsrfDns(['git.test' => ['93.184.216.34']]);
 
     // Default policy refuses both the ssh scheme and embedded credentials...
     expect(fn () => Http::ssrf()->get('ssh://user:token@git.test/acme/web.git'))

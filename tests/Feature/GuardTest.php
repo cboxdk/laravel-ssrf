@@ -5,19 +5,23 @@ declare(strict_types=1);
 use Cbox\Ssrf\Contracts\UrlGuard;
 use Cbox\Ssrf\Exceptions\BlockedUrl;
 use Cbox\Ssrf\Guard;
-use Cbox\Ssrf\GuardPolicy;
-use Cbox\Ssrf\Testing\FakeResolver;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\TransferStats;
 
 /**
- * Build a Guard whose DNS answers are fixed, so IP-based checks are deterministic.
+ * The guard, with DNS answers fixed so IP-based checks are deterministic.
+ *
+ * A thin wrapper over the package's own `InteractsWithSsrf` trait rather than a
+ * hand-rolled `new Guard(...)`: if the shipped trait is awkward for our suite it is
+ * awkward for a consumer's, and we would rather find that out here.
  *
  * @param  array<string, list<string>>  $dns
  */
-function guard(array $dns = []): Guard
+function guard(array $dns = []): UrlGuard
 {
-    return new Guard(app(GuardPolicy::class), new FakeResolver($dns));
+    test()->fakeSsrfDns($dns);
+
+    return test()->ssrfGuard();
 }
 
 it('allows a public host', function (): void {

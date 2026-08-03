@@ -4,6 +4,41 @@ All notable changes to `cboxdk/laravel-ssrf` are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.0]
+
+### Added
+
+- **`Cbox\Ssrf\Testing\InteractsWithSsrf`** — the test-side wiring the package was
+  missing. Compose it into your base `TestCase` for `fakeSsrfDns()`,
+  `withSsrfConfig()`, `ssrfGuard()` and `refreshSsrfGuard()`.
+
+  It exists because the guard and its policy are container **singletons** built from
+  config. If anything has already resolved the guard, a later
+  `config(['ssrf.enforce' => false])` silently changes nothing and the test asserts
+  against the old policy — a green test proving the wrong thing. Every helper drops
+  both singletons first. The package's own suite now goes through the trait rather
+  than hand-rolling `$this->app->instance(Resolver::class, ...)`, so the trait is
+  exercised by every test rather than merely shipped.
+
+### Fixed
+
+- **`SECURITY.md` described the package as pre-1.0.** It told researchers this was a
+  "pre-1.0, best-effort" project and that only the latest `0.x` tag received security
+  fixes, while the package was at 1.2.0 — a supported-versions statement naming a
+  version scheme the package had already left. It now states the real policy: latest
+  `1.x` only, no LTS branch, no backports, and explicitly no response-time guarantee.
+
+- `branch-alias` still declared `dev-main` as `1.0.x-dev` on a 1.2 package; it now
+  tracks `1.3.x-dev`.
+
+### Changed
+
+- `pestphp/pest` widened to `^4.0 || ^5.0` (was `^3.5 || ^4.0`), so the dev toolchain
+  covers the current major and the previous one. Pest 5 tracks PHPUnit 13, not Laravel;
+  verified on both CI cells — testbench `^11` resolves Pest 5.0.3 / PHPUnit 13.2.6, and
+  testbench `^10` resolves Pest 4.7.7 / PHPUnit 12.5.33, with the full suite green on
+  each.
+
 ## [1.2.0]
 
 ### Added

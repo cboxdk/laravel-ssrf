@@ -1,31 +1,52 @@
 ---
 title: Testing
-description: Deterministic SSRF tests with the FakeResolver
+description: Deterministic SSRF tests with InteractsWithSsrf and the FakeResolver
 weight: 7
 ---
 
 # Testing
 
 Real DNS is non-deterministic and slow, and you want to prove the guard blocks
-addresses you can't actually route to in CI. Bind the shipped `FakeResolver` to
-make resolution a fixture.
+addresses you can't actually route to in CI. Compose `InteractsWithSsrf` into your
+base `TestCase` and resolution becomes a fixture.
 
 ```php
-use Cbox\Ssrf\Contracts\Resolver;
-use Cbox\Ssrf\Testing\FakeResolver;
+use Cbox\Ssrf\Testing\InteractsWithSsrf;
 
+abstract class TestCase extends Orchestra\Testbench\TestCase
+{
+    use InteractsWithSsrf;
+}
+```
+
+```php
 beforeEach(function () {
-    $this->app->instance(Resolver::class, new FakeResolver([
+    $this->fakeSsrfDns([
         'good.test' => ['93.184.216.34'],
         'evil.test' => ['169.254.169.254'],
-    ]));
+    ]);
 });
 
 it('blocks a webhook that resolves to cloud metadata', function () {
-    expect(fn () => app(UrlGuard::class)->assertSafe('https://evil.test'))
+    expect(fn () => $this->ssrfGuard()->assertSafe('https://evil.test'))
         ->toThrow(Cbox\Ssrf\Exceptions\BlockedUrl::class);
 });
 ```
+
+## What the trait gives you
+
+| Method | Does |
+|---|---|
+| `fakeSsrfDns(array $dns)` | Answers DNS from a fixed `host => [addresses]` table. Returns the `FakeResolver`. |
+| `withSsrfConfig(array $overrides)` | Sets `config('ssrf.*')` keys (given without the prefix) and reapplies them. |
+| `ssrfGuard()` | The `UrlGuard` as the application sees it, rebuilt from current config and DNS. |
+| `refreshSsrfGuard()` | Drops the memoised policy and guard. The others call it for you. |
+
+That last point is the reason to use the trait rather than binding `FakeResolver`
+yourself: the guard and its policy are container **singletons** built from config, so
+if anything has already resolved the guard — a `beforeEach` that makes a request, say —
+a later `config(['ssrf.enforce' => false])` silently changes nothing and your test
+asserts against the old policy. Every helper here drops both singletons first.
 
 ## Testing your webhook delivery without real hosts
 
