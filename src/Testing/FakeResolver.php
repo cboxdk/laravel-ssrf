@@ -14,7 +14,7 @@ use Cbox\Ssrf\SystemResolver;
  *
  *   $this->app->instance(Resolver::class, new FakeResolver(['evil.test' => ['169.254.169.254']]));
  */
-final class FakeResolver implements Resolver
+class FakeResolver implements Resolver
 {
     /**
      * @param  array<string, list<string>>  $map  hostname (lowercase) => IPs

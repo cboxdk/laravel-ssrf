@@ -12,7 +12,7 @@ use RuntimeException;
  * safe to log but should not be echoed verbatim to an untrusted caller, since it
  * confirms internal-network reachability.
  */
-final class BlockedUrl extends RuntimeException
+class BlockedUrl extends RuntimeException
 {
     public static function make(string $reason): self
     {

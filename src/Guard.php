@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\IpUtils;
  * host resolves to is public unicast (not private, loopback, link-local,
  * cloud-metadata, or reserved) — for both IPv4 and IPv6.
  */
-final class Guard implements UrlGuard
+class Guard implements UrlGuard
 {
     public function __construct(
         private readonly GuardPolicy $policy,

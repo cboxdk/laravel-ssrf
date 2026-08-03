@@ -23,7 +23,7 @@ use Illuminate\Contracts\Validation\ValidationRule;
  *
  *   new PublicUrl(allowedSchemes: ['https', 'ssh'], allowCredentials: true)
  */
-final class PublicUrl implements ValidationRule
+class PublicUrl implements ValidationRule
 {
     /**
      * @param  list<string>|null  $allowedSchemes

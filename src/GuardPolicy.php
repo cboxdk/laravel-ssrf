@@ -8,7 +8,7 @@ namespace Cbox\Ssrf;
  * The immutable policy the {@see Guard} enforces, built from config. Every list
  * is normalized (lowercased) so comparisons are case-insensitive.
  */
-final readonly class GuardPolicy
+readonly class GuardPolicy
 {
     /**
      * @param  list<string>  $allowedSchemes

@@ -10,7 +10,7 @@ use Cbox\Ssrf\Contracts\Resolver;
  * The production resolver: consults the system DNS for both A and AAAA records.
  * IP literals are returned as-is.
  */
-final class SystemResolver implements Resolver
+class SystemResolver implements Resolver
 {
     public function resolve(string $host): array
     {
