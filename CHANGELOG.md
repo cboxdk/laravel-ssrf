@@ -27,7 +27,21 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `on_stats` consistency check is unchanged and still rejects any connection to an
   address outside the validated set.
 
+- **`sbom.json` named the wrong producer.** `bin/generate-sbom.php` was copied from
+  `cboxdk/laravel-id` and still hard-coded that package's name as the SBOM's producing
+  tool and as the seed for its deterministic serial number, so this package's
+  supply-chain record attributed itself to another package. Both are now derived from
+  `composer.json`, which also guarantees two cboxdk packages resolving the same
+  dependency set get distinct serial numbers.
+
 ### Internal
+
+- CI's SBOM freshness gate compared exact resolved versions. Because a library commits
+  no `composer.lock`, CI resolves fresh and picks up any upstream patch released since
+  the maintainer last ran `composer sbom`, so the gate could not be satisfied and had
+  been failing on unrelated `symfony/*` patches — including on the commit carrying the
+  DNS-pinning fix. It now compares the dependency *set* and runs on release tags,
+  matching `cboxdk/laravel-id`; version drift on `main` is reported as a notice.
 
 - The `on_stats` test now drives the callback with a real `TransferStats` for each
   validated address and for one outside the set, instead of only asserting the option

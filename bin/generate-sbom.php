@@ -32,7 +32,9 @@ usort($packages, static fn (array $a, array $b): int => strcmp((string) $a['name
 
 $components = array_map('componentFor', $packages);
 
-$serial = 'urn:uuid:'.deterministicUuid(implode('|', array_column($components, 'purl')));
+// Namespaced by this package's own name, so two cboxdk packages that happen to
+// resolve the same dependency set still get distinct serial numbers.
+$serial = 'urn:uuid:'.deterministicUuid((string) $self['name'], implode('|', array_column($components, 'purl')));
 
 $bom = [
     'bomFormat' => 'CycloneDX',
@@ -42,7 +44,9 @@ $bom = [
     'metadata' => [
         'tools' => [[
             'vendor' => 'cboxdk',
-            'name' => 'laravel-id-sbom',
+            // Derived from the package rather than hard-coded, so a copy of this
+            // script into a sibling package cannot keep claiming the wrong producer.
+            'name' => basename((string) $self['name']).'-sbom',
             'version' => '1.0.0',
         ]],
         'component' => [
@@ -119,9 +123,9 @@ function licenseEntries(array|string $license): array
     return [['expression' => '('.implode(' OR ', $items).')']];
 }
 
-function deterministicUuid(string $seed): string
+function deterministicUuid(string $namespace, string $seed): string
 {
-    $hash = md5('cboxdk/laravel-id:'.$seed);
+    $hash = md5($namespace.':'.$seed);
 
     return sprintf(
         '%s-%s-4%s-%s-%s',

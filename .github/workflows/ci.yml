@@ -3,6 +3,9 @@ name: ci
 on:
   push:
     branches: [main]
+    # Release tags too, so the SBOM freshness gate below actually runs where an
+    # accurate supply-chain record matters.
+    tags: ["v*"]
   pull_request:
 
 jobs:
@@ -35,14 +38,39 @@ jobs:
         run: composer audit --no-dev
       - name: License compliance
         run: composer license-check
-      # The SBOM is derived from composer.lock, which differs per Laravel major,
-      # so only assert freshness on the canonical cell (latest major).
-      - name: SBOM is up to date
+      # The SBOM is derived from composer.lock, which differs per Laravel major, so it
+      # is only generated on the canonical cell (latest major).
+      - name: SBOM
         if: matrix.php == '8.4' && matrix.testbench == '^11.0'
+        run: composer sbom
+      # An SBOM documents a RELEASE, so the gate lives on tags. But this is a library:
+      # composer.lock is intentionally not committed, so CI resolves fresh with
+      # `composer update` and will pick up any upstream patch published since the
+      # maintainer last ran `composer sbom`. An EXACT-match gate is therefore
+      # unwinnable — it failed on fa8ac67 purely because symfony/routing, /string and
+      # /var-dumper had published patches — and a gate that cannot be satisfied is one
+      # people learn to ignore. (Same failure mode fixed in cboxdk/laravel-id.)
+      #
+      # So compare the dependency SET, not the resolved versions. That still catches
+      # what provenance actually cares about — a dependency added or removed without
+      # the SBOM being regenerated — while tolerating the patch drift the lockfile-less
+      # model guarantees. The authoritative record of what a release actually resolved
+      # is the uploaded artifact below, generated from that build.
+      - name: SBOM dependency set is up to date (release tags)
+        if: matrix.php == '8.4' && matrix.testbench == '^11.0' && startsWith(github.ref, 'refs/tags/')
         run: |
-          composer sbom
-          git diff --exit-code sbom.json \
-            || (echo "::error::sbom.json is stale — run 'composer sbom' and commit the result." && exit 1)
+          git show HEAD:sbom.json > /tmp/sbom-committed.json
+          jq -r '[.components[].name] | sort | .[]' /tmp/sbom-committed.json > /tmp/set-committed.txt
+          jq -r '[.components[].name] | sort | .[]' sbom.json > /tmp/set-resolved.txt
+          if ! diff -u /tmp/set-committed.txt /tmp/set-resolved.txt; then
+            echo "::error::sbom.json lists a different dependency SET than this release resolves — a dependency was added or removed without regenerating it. Run 'composer sbom' and commit before tagging."
+            exit 1
+          fi
+      - name: SBOM drift (informational)
+        if: matrix.php == '8.4' && matrix.testbench == '^11.0' && !startsWith(github.ref, 'refs/tags/')
+        run: |
+          git diff --quiet sbom.json \
+            || echo "::notice::sbom.json drifted from the current resolve (usually an upstream patch release). Run 'composer sbom' before the next tag."
       - name: Upload SBOM
         if: matrix.php == '8.4' && matrix.testbench == '^11.0'
         uses: actions/upload-artifact@v4
