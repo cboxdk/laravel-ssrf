@@ -14,19 +14,22 @@ redirects — then it's the normal Laravel HTTP client:
 ```php
 use Illuminate\Support\Facades\Http;
 
-$response = Http::ssrf($endpoint)
+$response = Http::ssrf()
     ->withHeaders(['X-Signature' => $signature])
     ->post($endpoint, $payload);
 ```
 
-If `$endpoint` is unsafe, the macro throws `Cbox\Ssrf\Exceptions\BlockedUrl`
-*before* any request is made. Catch it to turn it into a domain error:
+The check happens at send time on the URL the client is actually given, so the URL
+that is validated is by construction the URL that is fetched.
+
+If `$endpoint` is unsafe, `Cbox\Ssrf\Exceptions\BlockedUrl` is thrown *before* the
+request leaves the process. Catch it to turn it into a domain error:
 
 ```php
 use Cbox\Ssrf\Exceptions\BlockedUrl;
 
 try {
-    Http::ssrf($endpoint)->post($endpoint, $payload);
+    Http::ssrf()->post($endpoint, $payload);
 } catch (BlockedUrl $e) {
     // Log it; do not echo $e->getMessage() to an untrusted caller — it confirms
     // internal reachability.

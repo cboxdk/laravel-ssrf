@@ -8,9 +8,9 @@ that points at a private, reserved, or cloud-metadata address.
 ```php
 use Illuminate\Support\Facades\Http;
 
-// Validates the URL, pins the connection to the resolved public IP, and
+// Validates the URL, pins the connection to the resolved public IPs, and
 // refuses to follow redirects — then behaves like the normal HTTP client.
-$response = Http::ssrf($url)->post($url, $payload);
+$response = Http::ssrf()->post($url, $payload);
 ```
 
 ## Why
@@ -61,8 +61,28 @@ php artisan vendor:publish --tag=ssrf-config
 ### Guard an outbound request
 
 ```php
-Http::ssrf($url)->get($url);          // GET, pinned + no-redirect
-Http::ssrf($url)->post($url, $data);  // throws Cbox\Ssrf\Exceptions\BlockedUrl if unsafe
+Http::ssrf()->get($url);          // GET, pinned + no-redirect
+Http::ssrf()->post($url, $data);  // throws Cbox\Ssrf\Exceptions\BlockedUrl if unsafe
+```
+
+The URL is validated and pinned at send time, so the URL that is checked is by
+construction the URL that is fetched. Every request this client makes is guarded,
+so one client can serve a loop:
+
+```php
+$client = Http::ssrf();
+
+foreach ($endpoints as $endpoint) {
+    $client->post($endpoint, $payload);  // each URL guarded and pinned on its own
+}
+```
+
+Passing the URL up front still works and additionally fails fast, before a request
+object exists — useful when you want the rejection where the URL is *chosen* rather
+than where it is sent:
+
+```php
+Http::ssrf($url)->post($url, $data);  // throws here if $url is unsafe
 ```
 
 ### Validate user-supplied URLs (form input)
@@ -99,7 +119,7 @@ $guard->assertSafe($webhookUrl, ['https']);
 
 // Git sink: HTTPS or SSH, and a deploy token in the URL is allowed.
 $guard->assertSafe($repoUrl, ['https', 'ssh'], allowCredentials: true);
-Http::ssrf($repoUrl, ['https', 'ssh'], allowCredentials: true)->get($repoUrl);
+Http::ssrf(allowedSchemes: ['https', 'ssh'], allowCredentials: true)->get($repoUrl);
 
 // Same overrides on the validation rule, per field:
 $request->validate([

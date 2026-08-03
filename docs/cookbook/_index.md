@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Http;
 use Cbox\Ssrf\Exceptions\BlockedUrl;
 
 try {
-    $response = Http::ssrf($endpoint->url)
+    $response = Http::ssrf()
         ->timeout(10)
         ->withHeaders(['X-Signature' => $signature])
         ->post($endpoint->url, $payload);

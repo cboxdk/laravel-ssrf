@@ -4,6 +4,44 @@ All notable changes to `cboxdk/laravel-ssrf` are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0]
+
+### Added
+
+- **`Http::ssrf()->get($url)` — the URL is now guarded at send time.** The macro's
+  `$url` argument is optional, and the client validates and pins whatever URL it is
+  finally given. One client can serve a loop of endpoints, each guarded and pinned on
+  its own.
+
+  This closes a hole in the old shape rather than just tidying it. `Http::ssrf($url)`
+  had to be handed the URL up front because `CURLOPT_RESOLVE` and `on_stats` are Guzzle
+  *options*, fixed when the request is configured rather than when it is sent — hence
+  `Http::ssrf($url)->get($url)`. But the two URLs were independent, so
+  `Http::ssrf($safe)->get($evil)` validated one and fetched the other. With
+  `pin_dns => false` or `enforce => false`, `pinnedOptions()` returns neither `on_stats`
+  nor `curl`, so **nothing at all** checked the URL actually fetched. Even with pinning
+  on, `on_stats` runs *after* the transfer: the request to the attacker's host is still
+  sent, so blind SSRF succeeds and only the response is withheld.
+
+  Guarding at send time makes the validated URL and the fetched URL the same URL by
+  construction. The guard runs under `Http::fake()` as well, so tests still see
+  `BlockedUrl`.
+
+- `Cbox\Ssrf\Http\GuardRequestMiddleware` and `Cbox\Ssrf\Http\GuardedHandler`, the Guzzle
+  middleware behind the above. `allow_redirects` stays eager on the PendingRequest —
+  Laravel pushes caller middleware *inside* Guzzle's redirect middleware, which has
+  already read its options by the time the guard runs.
+
+### Changed
+
+- Package classes are no longer `final`, so hosts can extend or decorate what the
+  package ships (`Guard`, `GuardPolicy`, `SystemResolver`, `SsrfServiceProvider`,
+  `BlockedUrl`, `PublicUrl`, `FakeResolver`).
+
+**Backwards compatible.** `Http::ssrf($url)` still works and still fails fast, before a
+request object is built — and it is now *also* correct when the URL passed to `get()`
+differs, because the sent URL is guarded regardless.
+
 ## [1.1.1]
 
 ### Fixed

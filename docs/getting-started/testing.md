@@ -34,8 +34,17 @@ Combine `FakeResolver` with Laravel's `Http::fake()`:
 ```php
 Http::fake(['good.test/*' => Http::response(['ok' => true])]);
 
-$response = Http::ssrf('https://good.test/hook')->post('https://good.test/hook');
+$response = Http::ssrf()->post('https://good.test/hook');
 expect($response->json('ok'))->toBeTrue();
+```
+
+The guard runs under `Http::fake()` too — it sits in the handler stack ahead of the
+stub — so a test that posts to a private address still gets `BlockedUrl`:
+
+```php
+Http::fake();
+
+expect(fn () => Http::ssrf()->post('https://bad.test/hook'))->toThrow(BlockedUrl::class);
 ```
 
 ## What the package's own suite covers
