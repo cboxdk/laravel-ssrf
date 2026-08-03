@@ -7,6 +7,8 @@ use Cbox\Ssrf\Exceptions\BlockedUrl;
 use Cbox\Ssrf\Guard;
 use Cbox\Ssrf\GuardPolicy;
 use Cbox\Ssrf\Testing\FakeResolver;
+use GuzzleHttp\Psr7\Request;
+use GuzzleHttp\TransferStats;
 
 /**
  * Build a Guard whose DNS answers are fixed, so IP-based checks are deterministic.
@@ -138,15 +140,30 @@ it('pins every validated address in ONE resolve entry, not one entry each', func
         ->toBe('dual.test:443:93.184.216.34,[2606:2800:220:1:248:1893:25c8:1946]');
 });
 
-it('still accepts a connection to either pinned address', function (): void {
-    // The on_stats consistency check reads the ORIGINAL address list, so widening the
-    // pin must not narrow what is accepted afterwards — otherwise the request connects
-    // and is then rejected by our own guard.
+it('accepts a connection to ANY validated address and still rejects one outside the set', function (): void {
+    // Widening the pin must not narrow what on_stats accepts afterwards, or the request
+    // connects to a perfectly valid pinned address and is then rejected by our own
+    // guard. This drives the callback for real rather than asserting it exists: delete
+    // the in_array() check in Guard::pinnedOptions() and the last expectation fails;
+    // narrow on_stats to $ips[0] and the loop fails.
     $ips = ['93.184.216.34', '2606:2800:220:1:248:1893:25c8:1946'];
     $options = guard(['dual.test' => $ips])->pinnedOptions('https://dual.test/hook');
 
-    expect($options)->toHaveKey('on_stats')
-        ->and($options['allow_redirects'])->toBeFalse();
+    $onStats = $options['on_stats'];
+
+    expect($onStats)->toBeCallable();
+
+    $connectingTo = static fn (string $ip): Closure => static fn (): mixed => $onStats(new TransferStats(
+        new Request('GET', 'https://dual.test/hook'),
+        handlerStats: ['primary_ip' => $ip],
+    ));
+
+    foreach ($ips as $ip) {
+        expect($connectingTo($ip))->not->toThrow(BlockedUrl::class);
+    }
+
+    // An address that was never validated is still refused, pin or no pin.
+    expect($connectingTo('203.0.113.9'))->toThrow(BlockedUrl::class, 'not in the validated set');
 });
 
 it('resolves the UrlGuard contract from the container', function (): void {

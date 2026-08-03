@@ -27,6 +27,12 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   `on_stats` consistency check is unchanged and still rejects any connection to an
   address outside the validated set.
 
+### Internal
+
+- The `on_stats` test now drives the callback with a real `TransferStats` for each
+  validated address and for one outside the set, instead of only asserting the option
+  exists — the previous form would have passed even with the check deleted.
+
 ## [1.1.0]
 
 ### Added
