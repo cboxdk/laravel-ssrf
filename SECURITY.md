@@ -6,9 +6,10 @@
 
 **Do not open a public issue.** Report privately via
 [GitHub Private Vulnerability Reporting](https://github.com/cboxdk/laravel-ssrf/security/advisories/new)
-(repository → **Security** → **Report a vulnerability**). This is a pre-1.0,
-best-effort open-source project; we'll respond as promptly as we can and coordinate
-disclosure with you. Good-faith research under this policy is authorized (safe harbor).
+(repository → **Security** → **Report a vulnerability**). This is a best-effort
+open-source project with no funded security team and no response-time guarantee; we'll
+respond as promptly as we can and coordinate disclosure with you. Good-faith research
+under this policy is authorized (safe harbor).
 
 If you have found an SSRF **bypass** — a URL that the guard accepts but which
 resolves to a private, reserved, or metadata address — that is exactly the class of
@@ -24,4 +25,6 @@ section of the [README](README.md).
 
 ## Supported versions
 
-Security fixes target the latest release. During `0.x`, only the latest tag.
+Security fixes target the **latest `1.x` release only**. There is no long-term-support
+branch and older minors are not backported — if you are behind, upgrading within `1.x`
+is the fix, and every `1.x` release so far has been backwards compatible.
