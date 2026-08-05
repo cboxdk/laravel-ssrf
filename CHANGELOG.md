@@ -4,6 +4,37 @@ All notable changes to `cboxdk/laravel-ssrf` are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0]
+
+### Fixed
+
+- **The package referenced Guzzle and PSR-7 without requiring them.** Three
+  namespaces appeared in real signatures in `src/` while `composer.json` declared
+  neither package: `GuzzleHttp\TransferStats` (in `Guard::pinnedOptions()`),
+  `GuzzleHttp\Promise\PromiseInterface` and `Psr\Http\Message\RequestInterface`
+  (in `GuardRequestMiddleware` and `GuardedHandler`).
+
+  They arrived transitively, but not dependably: `illuminate/http` only began
+  requiring `guzzlehttp/guzzle` partway through the 12.x line — `v12.0.0` requires
+  nothing Guzzle-related, `v12.64.0` requires `^7.8.2`. An app pinned to early 12.x
+  under this package's `illuminate/http: ^12.0` would autoload `GuardedHandler`
+  against a class that isn't there.
+
+  Now declared: `guzzlehttp/guzzle` `^7.8.2 || ^8.0`, `guzzlehttp/promises`
+  `^2.0 || ^3.0`, `psr/http-message` `^1.1 || ^2.0`, plus `guzzlehttp/psr7`
+  `^2.9 || ^3.0` in `require-dev` (the suite builds a `GuzzleHttp\Psr7\Request`
+  directly). Note `TransferStats` lives in `guzzlehttp/guzzle` itself rather than
+  `guzzlehttp/promises`, and sits in `pinnedOptions()` rather than the middleware —
+  so this is the whole client, not just the promise layer.
+
+  The installed graph is unchanged: `sbom.json` regenerates byte-identical at 73
+  production components. Only the declaration changes. Released as a minor rather
+  than a patch because new `require` constraints can narrow resolution for a
+  consumer that previously resolved.
+
+- `branch-alias` declared `dev-main` as `1.3.x-dev` after `v1.3.0` had shipped,
+  pointing dev consumers at a closed series; it now tracks `1.4.x-dev`.
+
 ## [1.3.0]
 
 ### Added
