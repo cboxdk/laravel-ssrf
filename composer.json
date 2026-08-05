@@ -14,12 +14,16 @@
     },
     "require": {
         "php": "^8.4",
+        "guzzlehttp/guzzle": "^7.8.2 || ^8.0",
+        "guzzlehttp/promises": "^2.0 || ^3.0",
         "illuminate/contracts": "^12.0 || ^13.0",
         "illuminate/http": "^12.0 || ^13.0",
         "illuminate/support": "^12.0 || ^13.0",
+        "psr/http-message": "^1.1 || ^2.0",
         "symfony/http-foundation": "^7.0 || ^8.0"
     },
     "require-dev": {
+        "guzzlehttp/psr7": "^2.9 || ^3.0",
         "larastan/larastan": "^3.0",
         "laravel/pint": "^1.18",
         "orchestra/testbench": "^10.0 || ^11.0",
