@@ -73,7 +73,7 @@ jobs:
             || echo "::notice::sbom.json drifted from the current resolve (usually an upstream patch release). Run 'composer sbom' before the next tag."
       - name: Upload SBOM
         if: matrix.php == '8.4' && matrix.testbench == '^11.0'
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: sbom-cyclonedx
           path: sbom.json
