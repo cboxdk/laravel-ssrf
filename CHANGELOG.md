@@ -4,7 +4,7 @@ All notable changes to `cboxdk/laravel-ssrf` are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.4.1]
 
 ### Security
 
@@ -21,6 +21,13 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
   list. A URL without a trailing dot produces a single entry, exactly as before.
   Apps that worked around this by stripping the dot before calling the guard can
   drop the workaround.
+
+### Changed
+
+- `sbom.json` regenerated. Fresh resolves now pick up Guzzle 8.2 and PSR-7 3.1 —
+  both already allowed by the constraints 1.4.0 declared — which drop
+  `ralouphie/getallheaders` and add `symfony/polyfill-php82`. Still 73 production
+  components. No constraint changes.
 
 ## [1.4.0]
 
