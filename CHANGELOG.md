@@ -4,7 +4,7 @@ All notable changes to `cboxdk/laravel-ssrf` are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [1.5.0]
 
 ### Security
 
@@ -34,7 +34,9 @@ adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 - A non-ASCII host now requires `ext-intl`; without it the guard refuses the URL
   rather than guess which name the client will resolve. `ext-intl` and `ext-curl`
-  are listed under `suggest`.
+  are listed under `suggest`. Released as a minor rather than a patch because URLs
+  that previously passed can now be refused.
+- `branch-alias` moves `dev-main` to the open `1.5.x-dev` series.
 
 ## [1.4.1]
 
