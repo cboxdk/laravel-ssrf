@@ -4,6 +4,38 @@ All notable changes to `cboxdk/laravel-ssrf` are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+
+- **Internationalized hosts were validated and pinned under the wrong name.** An
+  IDN-capable curl — most builds — looks up a non-ASCII host by its punycode form
+  (`bücher.example` → `xn--bcher-kva.example`). The guard resolved the raw UTF-8
+  bytes and pinned the UTF-8 spelling, so it validated a different DNS name from the
+  one curl connected to, and curl ignored the pin and went to DNS itself — the
+  rebinding window the pin exists to close, with `on_stats` firing only after the
+  request was sent. Hosts are now mapped with UTS #46 non-transitional processing,
+  as curl and browsers do (`faß` → `xn--fa-hia`, not `fass`), before any check runs,
+  and the pin covers the punycode name. A host that does not map cleanly is refused.
+
+- **Compatibility spellings slipped past the host block-list.** The same mapping
+  folds `ｌｏｃａｌｈｏｓｔ` (fullwidth) to `localhost`, `metadata.google。internal`
+  (ideographic full stop) to `metadata.google.internal`, and `１２７.０.０.１` to
+  `127.0.0.1`. Compared as written, none matched a block-list entry or an IP literal,
+  so `assertSafeRedirect()` and `enforce => false` — neither of which has a DNS
+  lookup to fail closed on — let them through. They are now checked in mapped form.
+
+- **Percent-encoded hosts are refused.** curl, like a browser, decodes the host
+  before resolving it: `%6cocalhost` reached `localhost` unblocked, and
+  `%61.evil.example` validated a DNS label curl never looks up while it connected to
+  `a.evil.example` unpinned. No legitimate URL percent-encodes its host.
+
+### Changed
+
+- A non-ASCII host now requires `ext-intl`; without it the guard refuses the URL
+  rather than guess which name the client will resolve. `ext-intl` and `ext-curl`
+  are listed under `suggest`.
+
 ## [1.4.1]
 
 ### Security

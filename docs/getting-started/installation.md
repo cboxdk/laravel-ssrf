@@ -41,3 +41,8 @@ Environment overrides: `SSRF_ENFORCE`.
 
 `ext-curl` is recommended: DNS pinning uses `CURLOPT_RESOLVE`, so without the cURL
 handler the guard still validates and disables redirects but cannot pin the socket.
+
+`ext-intl` is needed to accept internationalized (non-ASCII) hostnames. The guard
+maps them to punycode exactly as curl and browsers do before validating and pinning;
+without `ext-intl` it cannot know which name the client will resolve, so it refuses
+any non-ASCII host.

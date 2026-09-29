@@ -22,6 +22,10 @@
         "psr/http-message": "^1.1 || ^2.0",
         "symfony/http-foundation": "^7.0 || ^8.0"
     },
+    "suggest": {
+        "ext-curl": "Required for DNS pinning (CURLOPT_RESOLVE); without it the guard validates but cannot pin the connection.",
+        "ext-intl": "Required to accept internationalized (non-ASCII) hostnames; without it they are refused."
+    },
     "require-dev": {
         "guzzlehttp/psr7": "^2.9 || ^3.0",
         "larastan/larastan": "^3.0",

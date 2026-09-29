@@ -41,15 +41,18 @@ AAAA** records. Abstracting resolution is what makes the guard testable (bind a
 
 1. Parse the URL; require a scheme + host.
 2. Reject a disallowed scheme and any embedded credentials.
-3. Normalize the host (lowercase, strip brackets/trailing dot); reject blocked
-   names/suffixes.
+3. Normalize the host (lowercase, strip brackets/trailing dot); map an
+   internationalized host to punycode with UTS #46, as curl and browsers do (which
+   also folds `ｌｏｃａｌｈｏｓｔ` to `localhost`); refuse a percent-encoded host;
+   reject blocked names/suffixes.
 4. Resolve to IPs (or normalize an IP literal in redirect mode).
 5. For **every** address: reject blocked IPs and blocked CIDRs, then extract and
    re-check any IPv4 embedded in an IPv6 transition form.
-6. Produce pinned options for the caller's HTTP client. The pin names the host both
-   as written in the URL and in normalized form: curl matches `CURLOPT_RESOLVE`
-   against the name as written, so a pin for `example.com` alone would be ignored for
-   `https://example.com./` and curl would resolve it itself.
+6. Produce pinned options for the caller's HTTP client. The pin names every
+   spelling curl may look up — the normalized host, the host as written (trailing
+   dot included) in punycode, and the UTF-8 form a curl without IDN support
+   resolves — because curl matches `CURLOPT_RESOLVE` against the name it is about to
+   resolve and silently ignores a pin on any other spelling.
 
 ## Why validate the resolved IP, not the URL string
 

@@ -102,6 +102,18 @@ it('pins the sent host as written when it ends in a dot', function (): void {
     }
 });
 
+it('pins the sent internationalized host by its punycode name', function (): void {
+    Http::fake();
+    $this->fakeSsrfDns(['xn--bcher-kva.test' => ['93.184.216.34']]);
+
+    $captured = null;
+    Http::ssrf()->withMiddleware(captureOptions($captured))->get('https://bücher.test/hook');
+
+    if (defined('CURLOPT_RESOLVE')) {
+        expect($captured['curl'][CURLOPT_RESOLVE])->toContain('xn--bcher-kva.test:443:93.184.216.34');
+    }
+})->skip(! function_exists('idn_to_ascii'), 'requires ext-intl');
+
 it('honours per-call scheme and credential overrides on the sent URL', function (): void {
     Http::fake(['git.test/*' => Http::response('ok')]);
     $this->fakeSsrfDns(['git.test' => ['93.184.216.34']]);

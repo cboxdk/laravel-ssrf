@@ -107,15 +107,14 @@ class Guard implements UrlGuard
             // back to its own DNS lookup — the rebinding window the pin exists to
             // close — and `on_stats` only fires after the request has already gone out.
             //
-            // So pin the name as written AND the normalized one: the former is what
-            // curl looks up today, the latter covers a curl that normalizes first.
-            // Different names are different entries, so this does not trip the
-            // replacement rule above. Case needs no such treatment — curl lowercases
-            // both sides of the match.
+            // So pin every name curl might look up — see lookupNames(). Different
+            // names are different entries, so this does not trip the replacement rule
+            // above. Case needs no such treatment — curl lowercases both sides of the
+            // match.
             $options['curl'] = [
                 CURLOPT_RESOLVE => array_map(
                     static fn (string $name): string => $name.':'.$inspection['port'].':'.$addresses,
-                    array_values(array_unique([$host, $inspection['requestHost']])),
+                    $inspection['lookupNames'],
                 ),
             ];
         }
@@ -144,11 +143,10 @@ class Guard implements UrlGuard
     }
 
     /**
-     * `host` is the normalized form every check runs against; `requestHost` is the
-     * host as written in the URL (lowercased, brackets stripped), which is the name
-     * the HTTP client will actually look up.
+     * `host` is the normalized ASCII form every check runs against; `lookupNames` are
+     * the names the HTTP client may actually look up, which the pin has to cover.
      *
-     * @return array{host: string, requestHost: string, port: int, ips: list<string>}
+     * @return array{host: string, lookupNames: list<string>, port: int, ips: list<string>}
      */
     private function inspect(string $url, GuardPolicy $policy, bool $resolveDns): array
     {
@@ -176,8 +174,18 @@ class Guard implements UrlGuard
             throw BlockedUrl::make('credentials in the URL are not allowed');
         }
 
-        $requestHost = strtolower(trim((string) $parts['host'], '[]'));
-        $host = $this->normalizeHost($requestHost);
+        $written = strtolower(trim((string) $parts['host'], '[]'));
+
+        // curl, like a browser, percent-decodes the host before looking it up, so
+        // `%6cocalhost` reaches `localhost` while matching no block-list entry here,
+        // and `%61.evil.test` validates a DNS name curl never resolves. No legitimate
+        // URL percent-encodes its host, so refuse rather than re-implement the decoding.
+        if (str_contains($written, '%')) {
+            throw BlockedUrl::make('a percent-encoded host is not allowed');
+        }
+
+        $ascii = $this->asciiHost($written);
+        $host = $this->normalizeHost($ascii);
 
         if ($host === '') {
             throw BlockedUrl::make('URL host is empty');
@@ -192,7 +200,7 @@ class Guard implements UrlGuard
         // Enforcement can be disabled for on-prem installs that must reach
         // internal hosts; scheme/credential/host-block checks above still run.
         if (! $policy->enforce) {
-            return ['host' => $host, 'requestHost' => $requestHost, 'port' => $port, 'ips' => []];
+            return ['host' => $host, 'lookupNames' => $this->lookupNames($host, $ascii, $written), 'port' => $port, 'ips' => []];
         }
 
         $ips = $resolveDns ? $this->resolveHost($host) : $this->ipLiteral($host);
@@ -201,7 +209,77 @@ class Guard implements UrlGuard
             $this->assertPublicIp($ip, $host, $policy);
         }
 
-        return ['host' => $host, 'requestHost' => $requestHost, 'port' => $port, 'ips' => $ips];
+        return ['host' => $host, 'lookupNames' => $this->lookupNames($host, $ascii, $written), 'port' => $port, 'ips' => $ips];
+    }
+
+    /**
+     * The ASCII (punycode) form of a host, mapped the way curl maps it.
+     *
+     * An internationalized host is not looked up as written. An IDN-capable curl —
+     * which is most builds — converts it with UTS #46 non-transitional processing
+     * first (`bücher.test` → `xn--bcher-kva.test`, `faß.test` → `xn--fa-hia.test`),
+     * and browsers do the same. Every check therefore has to run against that ASCII
+     * name, or the guard validates one DNS name while the client connects to another.
+     *
+     * The mapping does more than punycode: it folds compatibility forms, so
+     * `ｌｏｃａｌｈｏｓｔ` (fullwidth) becomes `localhost`, `metadata.google。internal`
+     * (ideographic full stop) becomes `metadata.google.internal`, and `１２７.０.０.１`
+     * becomes `127.0.0.1`. Compared as written, all three slipped past the host
+     * block-list and the IP-literal check — in redirect mode and with enforcement off,
+     * where no DNS lookup was there to fail closed.
+     *
+     * A host that does not map cleanly is refused rather than passed through, and so
+     * is any non-ASCII host when ext-intl is missing: without the mapping there is no
+     * way to know which name the client will resolve.
+     */
+    private function asciiHost(string $host): string
+    {
+        // Pure ASCII is left alone, exactly as curl leaves it alone.
+        if (! preg_match('/[^\x00-\x7F]/', $host)) {
+            return $host;
+        }
+
+        if (! function_exists('idn_to_ascii')) {
+            throw BlockedUrl::make('a non-ASCII host requires ext-intl to validate safely');
+        }
+
+        $ascii = idn_to_ascii(
+            $host,
+            IDNA_NONTRANSITIONAL_TO_ASCII | IDNA_CHECK_BIDI | IDNA_CHECK_CONTEXTJ,
+            INTL_IDNA_VARIANT_UTS46,
+            $info,
+        );
+
+        if (! is_string($ascii) || $ascii === '' || (is_array($info) && ($info['errors'] ?? 0) !== 0)) {
+            throw BlockedUrl::make('host is not a valid internationalized domain name');
+        }
+
+        return strtolower($ascii);
+    }
+
+    /**
+     * Every name the HTTP client may look up for this host, for the resolve pin.
+     *
+     * curl matches a `CURLOPT_RESOLVE` entry against the name it is about to resolve,
+     * so a pin on any other spelling is silently ignored and curl goes to DNS — the
+     * rebinding window the pin exists to close, with `on_stats` firing only after the
+     * request has already gone out. That name is the host as written in the URL,
+     * trailing dot included (`example.test.` does not match a pin for `example.test`),
+     * converted to punycode when it is internationalized. Pinned, in order:
+     *
+     * - the normalized ASCII host, for a client that normalizes before looking up;
+     * - the ASCII host as written, which is what IDN-capable curl looks up;
+     * - the host as written in UTF-8, which is what a curl built WITHOUT IDN support
+     *   hands to the system resolver.
+     *
+     * Each entry carries the addresses validated for the normalized host, so whichever
+     * one curl matches, it connects only to validated addresses.
+     *
+     * @return list<string>
+     */
+    private function lookupNames(string $host, string $ascii, string $written): array
+    {
+        return array_values(array_unique([$host, $ascii, $written]));
     }
 
     /**

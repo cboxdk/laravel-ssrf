@@ -195,6 +195,90 @@ it('produces a resolve pin that libcurl actually honours for a trailing-dot host
     expect(curl_errno($handle))->toBe(CURLE_COULDNT_CONNECT);
 })->skip(! function_exists('curl_init'), 'requires ext-curl');
 
+it('validates and pins an internationalized host by its punycode name', function (): void {
+    // An IDN-capable curl looks up `xn--bcher-kva.test`, never `bücher.test`. The guard
+    // used to resolve and pin the UTF-8 spelling, so it validated a different DNS name
+    // from the one curl connected to, and the pin was ignored.
+    $options = guard(['xn--bcher-kva.test' => ['93.184.216.34']])->pinnedOptions('https://Bücher.test/hook');
+
+    if (! defined('CURLOPT_RESOLVE')) {
+        expect(true)->toBeTrue();
+
+        return;
+    }
+
+    expect($options['curl'][CURLOPT_RESOLVE])->toBe([
+        'xn--bcher-kva.test:443:93.184.216.34',
+        // For a curl built without IDN, which resolves the UTF-8 name as written.
+        'bücher.test:443:93.184.216.34',
+    ]);
+})->skip(! function_exists('idn_to_ascii'), 'requires ext-intl');
+
+it('resolves the punycode name, not the UTF-8 bytes, of an internationalized host', function (): void {
+    // DNS answered for the UTF-8 bytes only: if the guard were still resolving the name
+    // as written, this would pass validation for a name curl never looks up.
+    expect(guard(['bücher.test' => ['93.184.216.34']])->isSafe('https://bücher.test/'))->toBeFalse()
+        ->and(guard(['xn--bcher-kva.test' => ['10.0.0.5']])->isSafe('https://bücher.test/'))->toBeFalse();
+})->skip(! function_exists('idn_to_ascii'), 'requires ext-intl');
+
+it('maps with UTS 46 non-transitional processing, as curl and browsers do', function (): void {
+    // Transitional processing would turn `faß` into `fass` — a different domain.
+    expect(guard(['xn--fa-hia.test' => ['93.184.216.34']])->isSafe('https://faß.test/'))->toBeTrue()
+        ->and(guard(['fass.test' => ['93.184.216.34']])->isSafe('https://faß.test/'))->toBeFalse();
+})->skip(! function_exists('idn_to_ascii'), 'requires ext-intl');
+
+it('blocks compatibility spellings of blocked hosts and loopback literals', function (string $url): void {
+    // curl and browsers fold these to `localhost`, `metadata.google.internal` and
+    // `127.0.0.1` before connecting. Compared as written they matched no block-list
+    // entry and no IP literal, so redirect mode — which does no DNS lookup to fail
+    // closed on — let them through.
+    guard()->assertSafeRedirect($url);
+})->with([
+    'fullwidth localhost' => 'http://ｌｏｃａｌｈｏｓｔ/',
+    'ideographic full stop' => "http://metadata.google\u{3002}internal/computeMetadata/v1/",
+    'blocked suffix' => "http://db\u{FF0E}internal/",
+    'fullwidth digits' => 'http://１２７.０.０.１/',
+])->throws(BlockedUrl::class)->skip(! function_exists('idn_to_ascii'), 'requires ext-intl');
+
+it('refuses a percent-encoded host', function (callable $check): void {
+    // curl decodes the host before resolving it: `%6cocalhost` connects to localhost,
+    // and `%61.evil.test` is looked up as `a.evil.test` — a name nothing validated.
+    $check();
+})->with([
+    'redirect mode, blocked host' => [fn () => guard()->assertSafeRedirect('http://%6cocalhost/')],
+    'fetch mode, DNS answering the encoded label' => [
+        fn () => guard(['%61.evil.test' => ['93.184.216.34']])->assertSafe('http://%61.evil.test/'),
+    ],
+])->throws(BlockedUrl::class, 'percent-encoded host');
+
+it('refuses a host that is not a valid internationalized name', function (): void {
+    // Unmappable means we cannot know which name the client would resolve.
+    guard()->assertSafeRedirect("https://a\u{200D}b.test/"); // ZWJ outside a joining context
+})->throws(BlockedUrl::class, 'not a valid internationalized domain name')
+    ->skip(! function_exists('idn_to_ascii'), 'requires ext-intl');
+
+it('produces a resolve pin that libcurl actually honours for an internationalized host', function (): void {
+    // Same method as the trailing-dot test: keep the pinned names, point them at a
+    // closed local port, and require a connect failure rather than a DNS one.
+    $options = guard(['xn--bcher-kva.invalid' => ['93.184.216.34']])
+        ->pinnedOptions('http://bücher.invalid:9/');
+
+    $handle = curl_init('http://bücher.invalid:9/');
+    curl_setopt_array($handle, [
+        CURLOPT_RESOLVE => array_map(
+            static fn (string $entry): string => preg_replace('/:[^:]+$/', ':127.0.0.1', $entry) ?? $entry,
+            $options['curl'][CURLOPT_RESOLVE],
+        ),
+        CURLOPT_PROXY => '',
+        CURLOPT_NOPROXY => '*',
+        CURLOPT_TIMEOUT => 5,
+        CURLOPT_RETURNTRANSFER => true,
+    ]);
+    curl_exec($handle);
+
+    expect(curl_errno($handle))->toBe(CURLE_COULDNT_CONNECT);
+})->skip(! function_exists('curl_init') || ! function_exists('idn_to_ascii'), 'requires ext-curl and ext-intl');
+
 it('accepts a connection to ANY validated address and still rejects one outside the set', function (): void {
     // Widening the pin must not narrow what on_stats accepts afterwards, or the request
     // connects to a perfectly valid pinned address and is then rejected by our own
