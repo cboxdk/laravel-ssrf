@@ -46,7 +46,10 @@ AAAA** records. Abstracting resolution is what makes the guard testable (bind a
 4. Resolve to IPs (or normalize an IP literal in redirect mode).
 5. For **every** address: reject blocked IPs and blocked CIDRs, then extract and
    re-check any IPv4 embedded in an IPv6 transition form.
-6. Produce pinned options for the caller's HTTP client.
+6. Produce pinned options for the caller's HTTP client. The pin names the host both
+   as written in the URL and in normalized form: curl matches `CURLOPT_RESOLVE`
+   against the name as written, so a pin for `example.com` alone would be ignored for
+   `https://example.com./` and curl would resolve it itself.
 
 ## Why validate the resolved IP, not the URL string
 

@@ -4,6 +4,24 @@ All notable changes to `cboxdk/laravel-ssrf` are documented here. The format is
 based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project
 adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Security
+
+- **The DNS pin was ignored for a host written with a trailing dot.** The guard
+  validates the normalized host (`example.com.` → `example.com`) and pinned only
+  that name, but curl matches a `CURLOPT_RESOLVE` entry against the host as written
+  in the URL. For `https://example.com./` the pin never applied: curl did its own
+  DNS lookup at connect time, reopening the rebinding (TOCTOU) window the pin exists
+  to close. `on_stats` still rejected an unvalidated connected IP, but only after the
+  request had been sent — enough for blind SSRF.
+
+  `pinnedOptions()` — and therefore `Http::ssrf()` — now pins the host both as
+  written and in normalized form, each entry carrying the full validated address
+  list. A URL without a trailing dot produces a single entry, exactly as before.
+  Apps that worked around this by stripping the dot before calling the guard can
+  drop the workaround.
+
 ## [1.4.0]
 
 ### Fixed
