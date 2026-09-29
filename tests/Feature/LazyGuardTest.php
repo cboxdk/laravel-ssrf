@@ -88,6 +88,20 @@ it('applies the resolve pin and disables redirects for the sent URL', function (
     }
 });
 
+it('pins the sent host as written when it ends in a dot', function (): void {
+    Http::fake();
+
+    $captured = null;
+    Http::ssrf()->withMiddleware(captureOptions($captured))->get('https://dual.test./hook');
+
+    if (defined('CURLOPT_RESOLVE')) {
+        // curl looks the host up as written, so the dotted name must be pinned too.
+        expect($captured['curl'][CURLOPT_RESOLVE])->toContain(
+            'dual.test.:443:93.184.216.34,[2606:2800:220:1:248:1893:25c8:1946]',
+        );
+    }
+});
+
 it('honours per-call scheme and credential overrides on the sent URL', function (): void {
     Http::fake(['git.test/*' => Http::response('ok')]);
     $this->fakeSsrfDns(['git.test' => ['93.184.216.34']]);

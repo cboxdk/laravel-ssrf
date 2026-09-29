@@ -144,6 +144,57 @@ it('pins every validated address in ONE resolve entry, not one entry each', func
         ->toBe('dual.test:443:93.184.216.34,[2606:2800:220:1:248:1893:25c8:1946]');
 });
 
+it('pins the host as written in the URL when it ends in a dot', function (): void {
+    // The bug this covers: the guard validates the normalized host (`example.test.` →
+    // `example.test`) and pinned only that name, but curl matches a resolve entry
+    // against the host AS WRITTEN in the URL. The pin was silently ignored for
+    // `https://dual.test./`, curl did its own DNS lookup, and the rebinding window the
+    // pin exists to close was open again — on_stats only fires after the request went.
+    $options = guard(['dual.test' => ['93.184.216.34', '2606:2800:220:1:248:1893:25c8:1946']])
+        ->pinnedOptions('https://Dual.TEST./hook');
+
+    if (! defined('CURLOPT_RESOLVE')) {
+        expect(true)->toBeTrue();
+
+        return;
+    }
+
+    // Both names, each carrying the full address list: the written form for curl as it
+    // behaves today, the normalized form for one that normalizes before matching.
+    expect($options['curl'][CURLOPT_RESOLVE])->toBe([
+        'dual.test:443:93.184.216.34,[2606:2800:220:1:248:1893:25c8:1946]',
+        'dual.test.:443:93.184.216.34,[2606:2800:220:1:248:1893:25c8:1946]',
+    ]);
+});
+
+it('produces a resolve pin that libcurl actually honours for a trailing-dot host', function (): void {
+    // The shape test above only proves what we emit; this proves curl uses it. The
+    // guard needs a public address to pass, so keep the names it pins and swap only the
+    // address for a closed local port: an honoured pin then fails fast at CONNECT, while
+    // an ignored one sends curl to DNS, where `.invalid` never resolves (RFC 6761).
+    // Asserting the connect failure rather than "not a resolve failure" means a slow DNS
+    // timeout cannot pass for a working pin.
+    $options = guard(['pin-probe.invalid' => ['93.184.216.34']])
+        ->pinnedOptions('http://pin-probe.invalid.:9/');
+
+    $handle = curl_init('http://pin-probe.invalid.:9/');
+    curl_setopt_array($handle, [
+        CURLOPT_RESOLVE => array_map(
+            static fn (string $entry): string => preg_replace('/:[^:]+$/', ':127.0.0.1', $entry) ?? $entry,
+            $options['curl'][CURLOPT_RESOLVE],
+        ),
+        // An explicit empty proxy overrides any *_proxy environment variable, which
+        // would otherwise do the lookup on curl's behalf.
+        CURLOPT_PROXY => '',
+        CURLOPT_NOPROXY => '*',
+        CURLOPT_TIMEOUT => 5,
+        CURLOPT_RETURNTRANSFER => true,
+    ]);
+    curl_exec($handle);
+
+    expect(curl_errno($handle))->toBe(CURLE_COULDNT_CONNECT);
+})->skip(! function_exists('curl_init'), 'requires ext-curl');
+
 it('accepts a connection to ANY validated address and still rejects one outside the set', function (): void {
     // Widening the pin must not narrow what on_stats accepts afterwards, or the request
     // connects to a perfectly valid pinned address and is then rejected by our own

@@ -92,15 +92,31 @@ class Guard implements UrlGuard
             //
             // curl's documented format is `host:port:addr[,addr]...`, and with the whole
             // list in one entry it does Happy Eyeballs across the family as usual.
+            $addresses = implode(',', array_map(
+                // Bracketed, because a bare IPv6 address is ambiguous against the
+                // colon separators the format itself uses.
+                static fn (string $ip): string => str_contains($ip, ':') ? '['.$ip.']' : $ip,
+                $ips,
+            ));
+
+            // The pin must name the host exactly as curl will look it up — and curl
+            // looks it up as WRITTEN in the URL. The guard validates the normalized
+            // form (`example.com.` → `example.com`), but curl matches a resolve entry
+            // against the name in the URL, trailing dot included, so a pin for
+            // `example.com` does nothing for `https://example.com./`. curl then falls
+            // back to its own DNS lookup — the rebinding window the pin exists to
+            // close — and `on_stats` only fires after the request has already gone out.
+            //
+            // So pin the name as written AND the normalized one: the former is what
+            // curl looks up today, the latter covers a curl that normalizes first.
+            // Different names are different entries, so this does not trip the
+            // replacement rule above. Case needs no such treatment — curl lowercases
+            // both sides of the match.
             $options['curl'] = [
-                CURLOPT_RESOLVE => [
-                    $host.':'.$inspection['port'].':'.implode(',', array_map(
-                        // Bracketed, because a bare IPv6 address is ambiguous against the
-                        // colon separators the format itself uses.
-                        static fn (string $ip): string => str_contains($ip, ':') ? '['.$ip.']' : $ip,
-                        $ips,
-                    )),
-                ],
+                CURLOPT_RESOLVE => array_map(
+                    static fn (string $name): string => $name.':'.$inspection['port'].':'.$addresses,
+                    array_values(array_unique([$host, $inspection['requestHost']])),
+                ),
             ];
         }
 
@@ -128,7 +144,11 @@ class Guard implements UrlGuard
     }
 
     /**
-     * @return array{host: string, port: int, ips: list<string>}
+     * `host` is the normalized form every check runs against; `requestHost` is the
+     * host as written in the URL (lowercased, brackets stripped), which is the name
+     * the HTTP client will actually look up.
+     *
+     * @return array{host: string, requestHost: string, port: int, ips: list<string>}
      */
     private function inspect(string $url, GuardPolicy $policy, bool $resolveDns): array
     {
@@ -156,7 +176,8 @@ class Guard implements UrlGuard
             throw BlockedUrl::make('credentials in the URL are not allowed');
         }
 
-        $host = $this->normalizeHost((string) $parts['host']);
+        $requestHost = strtolower(trim((string) $parts['host'], '[]'));
+        $host = $this->normalizeHost($requestHost);
 
         if ($host === '') {
             throw BlockedUrl::make('URL host is empty');
@@ -171,7 +192,7 @@ class Guard implements UrlGuard
         // Enforcement can be disabled for on-prem installs that must reach
         // internal hosts; scheme/credential/host-block checks above still run.
         if (! $policy->enforce) {
-            return ['host' => $host, 'port' => $port, 'ips' => []];
+            return ['host' => $host, 'requestHost' => $requestHost, 'port' => $port, 'ips' => []];
         }
 
         $ips = $resolveDns ? $this->resolveHost($host) : $this->ipLiteral($host);
@@ -180,7 +201,7 @@ class Guard implements UrlGuard
             $this->assertPublicIp($ip, $host, $policy);
         }
 
-        return ['host' => $host, 'port' => $port, 'ips' => $ips];
+        return ['host' => $host, 'requestHost' => $requestHost, 'port' => $port, 'ips' => $ips];
     }
 
     /**
